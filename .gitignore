@@ -1,0 +1,39 @@
+*~
+*.swp
+
+# By Eric
+.settings
+.svn
+.project
+.classpath
+.build
+deploy.properties
+target
+MANIFEST.MF
+/bin
+
+# output of git svn show-ignore below
+# /
+/target
+/work
+/dojo
+/*.iws
+/*.ipr
+/*.iml
+/derby.log
+/maven.log
+/build.xml
+/build-dependency.xml
+/velocity.log*
+/junit*.properties
+/surefire*.properties
+/.project
+/.classpath
+/.settings
+/.deployables
+/.wtpmodules
+/.externalToolBuilders
+/create.sql
+/drop.sql
+/derby.log
+
