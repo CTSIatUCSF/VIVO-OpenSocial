@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright (c) 2012, Cornell University
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the name of Cornell University nor the names of its contributors
+      may be used to endorse or promote products derived from this software
+      without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<!-- ====================================================================== 
+	 Compile the JSPs to check for compile errors.
+	 
+	 As this stands, you need to be sure that the "war" or "deploy" step in the 
+	 main build has already happened. There is no check here to ensure that the 
+	 ".build/war" directory is current.
+	     ====================================================================== -->
+<project name="Check JSPs for compile errors" default="all" basedir="../..">
+	<!-- Get tomcat.home and webapp.name from the deploy.properties file. -->
+	<property name="deploy.properties.file" location="deploy.properties" />
+	<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+		<condition>
+			<not>
+				<available file="${deploy.properties.file}" />
+			</not>
+		</condition>
+	</fail>
+	<property file="${deploy.properties.file}" />
+	<fail unless="tomcat.home"
+	      message="${deploy.properties.file} must contain a value for tomcat.home" />
+	<fail unless="webapp.name"
+	      message="${deploy.properties.file} must contain a value for webapp.name" />
+
+	<property name="build.jsp.dir" location=".build/jsp" />
+	<property name="build.war.dir" location=".build/war" />
+
+	<!-- Where are the Tomcat classes? -->
+	<path id="jasper.classpath">
+		<fileset dir="${tomcat.home}/bin">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${tomcat.home}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- Add in the project classes -->
+	<path id="compile.classpath">
+		<path refid="jasper.classpath" />
+		<pathelement location="${build.war.dir}/WEB-INF/classes" />
+		<fileset dir="${build.war.dir}/WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Define the Jasper task -->
+	<taskdef classname="org.apache.jasper.JspC" name="jasper2">
+		<classpath refid="jasper.classpath" />
+	</taskdef>
+
+	<target name="clean"
+	        description="Delete all build artifacts, so the next build starts from a clean slate">
+		<delete dir="${build.jsp.dir}" />
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${build.jsp.dir}" />
+		<mkdir dir="${build.jsp.dir}/src" />
+		<mkdir dir="${build.jsp.dir}/classes" />
+	</target>
+
+	<target name="jspc" depends="prepare">
+		<jasper2 validateXml="false"
+		         uriroot="${build.war.dir}"
+		         webXmlFragment="${build.jsp.dir}generated_web.xml"
+		         outputDir="${build.jsp.dir}/src"
+		         trimSpaces="true"
+		         failOnError="true" />
+	</target>
+
+	<target name="compile" depends="jspc">
+		<javac destdir="${build.jsp.dir}/classes"
+		       optimize="off"
+		       debug="off"
+		       failonerror="true"
+			   includeantruntime="false"
+		       srcdir="${build.jsp.dir}/src"
+		       excludes="**/*.smap">
+			<classpath refid="compile.classpath" />
+			<include name="**" />
+			<exclude name="tags/**" />
+		</javac>
+	</target>
+
+	<target name="all"
+	        depends="clean, compile"
+	        description="Compile the JSPs to classfiles, just to check for compile errors." />
+</project>

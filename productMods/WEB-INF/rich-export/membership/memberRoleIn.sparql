@@ -1,0 +1,15 @@
+PREFIX core: <http://vivoweb.org/ontology/core#>
+
+CONSTRUCT {
+     ?endeavor ?property ?object .
+} WHERE {
+     PERSON_URI core:hasMemberRole ?memberRole .
+     
+     {
+       {?memberRole core:roleRealizedIn ?endeavor }
+          union
+       {?memberRole core:roleContributesTo ?endeavor }
+     }
+           
+     ?endeavor ?property ?object .
+}

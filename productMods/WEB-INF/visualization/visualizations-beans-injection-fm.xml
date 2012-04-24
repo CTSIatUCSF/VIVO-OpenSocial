@@ -1,0 +1,155 @@
+<!--
+Copyright (c) 2012, Cornell University
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the name of Cornell University nor the names of its contributors
+      may be used to endorse or promote products derived from this software
+      without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+
+	<bean id="person_pub_count"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.PersonPublicationCountRequestHandler" />
+	
+	<bean id="utilities"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.utilities.UtilitiesRequestHandler" />
+	
+	<bean id="coauthorship"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.CoAuthorshipRequestHandler" />
+		
+	<bean id="person_grant_count"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.persongrantcount.PersonGrantCountRequestHandler" />
+	
+	<bean id="person_level"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.personlevel.PersonLevelRequestHandler" />
+
+	<bean id="coprincipalinvestigator"
+		class="edu.cornell.mannlib.vitro.webapp.visualization.coprincipalinvestigator.CoPIGrantCountRequestHandler" />
+
+    <bean id="pub_temporal"
+        class="edu.cornell.mannlib.vitro.webapp.visualization.temporalgraph.TemporalPublicationVisualizationRequestHandler" />		
+
+    <bean id="grant_temporal"
+        class="edu.cornell.mannlib.vitro.webapp.visualization.temporalgraph.TemporalGrantVisualizationRequestHandler" />	
+	
+    <bean id="map_of_science"
+        class="edu.cornell.mannlib.vitro.webapp.visualization.mapofscience.MapOfScienceVisualizationRequestHandler" />
+	
+	<bean id="regenerate_vis_models"
+        class="edu.cornell.mannlib.vitro.webapp.visualization.modelconstructor.ModelConstructorRequestHandler" />
+        
+	<bean id="tools"
+        class="edu.cornell.mannlib.vitro.webapp.visualization.tools.ToolsRequestHandler" />
+        
+	<bean id="visualizationInjector"
+		class="edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationInjector">
+		<property name="visualizations">
+			<map>
+				<entry key="person_pub_count">
+					<ref bean="person_pub_count"></ref>
+				</entry>
+				
+				<entry key="utilities">
+					<ref bean="utilities"></ref>
+				</entry>
+				
+				<entry key="coauthorship">
+					<ref bean="coauthorship"></ref>
+				</entry>
+				
+				<entry key="person_grant_count">
+					<ref bean="person_grant_count"></ref>
+				</entry>
+				
+				<entry key="person_level">
+					<ref bean="person_level"></ref>
+				</entry>
+				
+				<entry key="author-network">
+					<ref bean="person_level"></ref>
+				</entry>
+				
+				<entry key="investigator-network">
+					<ref bean="person_level"></ref>
+				</entry>
+                
+                <!-- 
+                <entry key="entity_comparison">
+                    <ref bean="entity_comparison"></ref>
+                </entry>
+                -->
+                
+                <entry key="entity_comparison">
+                    <ref bean="pub_temporal"></ref>
+                </entry>
+                                
+                <entry key="pub_temporal">
+                    <ref bean="pub_temporal"></ref>
+                </entry>
+                
+                <entry key="publication-graph">
+                    <ref bean="pub_temporal"></ref>
+                </entry>
+
+				<entry key="coprincipalinvestigator">
+					<ref bean="coprincipalinvestigator"></ref>
+				</entry>
+				
+				<entry key="entity_grant_count">
+					<ref bean="grant_temporal"></ref>
+				</entry>	
+				                                
+                <entry key="grant_temporal">
+                    <ref bean="grant_temporal"></ref>
+                </entry>
+                
+                <entry key="grant-graph">
+                    <ref bean="grant_temporal"></ref>
+                </entry>                			
+				 
+                <entry key="map-of-science">
+                    <ref bean="map_of_science"></ref>
+                </entry>    
+                
+				<entry key="refresh-cache">
+                    <ref bean="regenerate_vis_models"></ref>
+                </entry>
+                
+                <entry key="tools">
+                    <ref bean="tools"></ref>
+                </entry>    				 
+				 
+			</map>
+		</property>
+
+	</bean>
+
+</beans>
