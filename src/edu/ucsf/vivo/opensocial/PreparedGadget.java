@@ -80,14 +80,14 @@ public class PreparedGadget {
 		return reqs != null ? reqs.getClosedWidth() : 0;
 	}
 
-	public boolean GetStartClosed() {
+	public boolean getStartClosed() {
 		GadgetViewRequirements reqs = getGadgetViewRequirements();
 		// if the page specific reqs are present, honor those. Otherwise defaut
 		// to true for regular gadgets, false for sandbox gadgets
 		return reqs != null ? reqs.getStartClosed() : !gadgetSpec.FromSandbox();
 	}
 
-	public String GetChromeId() {
+	public String getChromeId() {
 		GadgetViewRequirements reqs = getGadgetViewRequirements();
 		if (reqs != null) {
 			return reqs.getChromeId();

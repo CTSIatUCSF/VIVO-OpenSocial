@@ -170,12 +170,12 @@ public class GadgetSpec {
 		return (count == 1);
 	}
 
-	public boolean FromSandbox() {
+	public boolean fromSandbox() {
 		return fromSandbox;
 	}
 
 	// who sees it? Return the viewerReq for the ProfileDetails page
-	public char GetVisibleScope() {
+	public char getVisibleScope() {
 		GadgetViewRequirements req = getGadgetViewRequirements("ProfileDetails.aspx");
 		return req != null ? req.getViewerReq() : ' ';
 	}

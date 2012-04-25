@@ -17,7 +17,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController;
 
 public class OpenSocialHelper {
 	public static final String OPENSOCIAL_DEBUG = "OPENSOCIAL_DEBUG";
@@ -41,30 +46,36 @@ public class OpenSocialHelper {
 
 	private BasicDataSource dataSource;
 
-	public OpenSocialHelper(int viewerId, int ownerId,
-			HttpServletRequest request) throws SQLException, IOException {
-		this.viewerId = viewerId;
-		this.ownerId = ownerId;
-		this.isDebug = request.getSession() != null
-				&& Boolean.TRUE.equals(request.getSession().getAttribute(
+	public OpenSocialHelper(VitroRequest vreq) throws SQLException, IOException {
+		this.isDebug = vreq.getSession() != null
+				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
 						OPENSOCIAL_DEBUG));
-		this.noCache = request.getSession() != null
-				&& Boolean.TRUE.equals(request.getSession().getAttribute(
+		this.noCache = vreq.getSession() != null
+				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
 						OPENSOCIAL_NOCACHE));
-		this.pageName = request.getPathTranslated(); // http://www.exampledepot.com/egs/javax.servlet/GetReqUrl.html
+		this.pageName = vreq.getPathTranslated(); // http://www.exampledepot.com/egs/javax.servlet/GetReqUrl.html
 
-		configuration = ConfigurationProperties.getBean(request.getSession()
+		configuration = ConfigurationProperties.getBean(vreq.getSession()
 				.getServletContext());
 
 		if (configuration.getProperty("OpenSocialURL") == null) {
 			// do nothing
 			return;
 		}
+		String defaultNamespace = configuration
+				.getProperty("Vitro.defaultNamespace");
+		UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
+		this.viewerId = viewer != null ? Integer.parseInt(viewer.getUri()
+				.substring(defaultNamespace.length())) : -1;
+
+		Individual owner = IndividualController.getIndividualFromRequest(vreq);
+		this.ownerId = owner != null ? Integer.parseInt(owner.getLocalName())
+				: -1;
 
 		Random random = new Random();
 
 		boolean gadgetLogin = pageName.contains("gadgetlogin");
-		String requestAppId = request.getParameter("appId");
+		String requestAppId = vreq.getParameter("appId");
 
 		Map<String, GadgetSpec> dbApps = new HashMap<String, GadgetSpec>();
 		Map<String, GadgetSpec> officialApps = new HashMap<String, GadgetSpec>();
@@ -123,9 +134,9 @@ public class OpenSocialHelper {
 		// Note that this block of code only gets executed after someone logs in
 		// with gadgetlogin.aspx!
 		int moduleId = 0;
-		if (request.getSession() != null
-				&& request.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
-			String openSocialGadgetURLS = (String) request.getSession()
+		if (vreq.getSession() != null
+				&& vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
+			String openSocialGadgetURLS = (String) vreq.getSession()
 					.getAttribute(OPENSOCIAL_GADGETS);
 			String[] urls = openSocialGadgetURLS.split(System
 					.getProperty("line.separator"));
@@ -390,5 +401,59 @@ public class OpenSocialHelper {
 		} while (bytes > 0);
 
 		return page;
+	}
+
+	public String getOpensocialJavascipt() {
+		String lineSeparator = System.getProperty("line.separator");
+		String gadgetScriptText = "<script type=\"text/javascript\" src=\""
+				+ getContainerJavascriptSrc()
+				+ "\"></script>"
+				+ lineSeparator
+				+ "<script type=\"text/javascript\" language=\"javascript\">"
+				+ lineSeparator
+				+ "var my = {};"
+				+ lineSeparator
+				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
+				+ lineSeparator + "this.appId = appId;" + lineSeparator
+				+ "this.name = name;" + lineSeparator + "this.url = url;"
+				+ lineSeparator + "this.secureToken = secureToken;"
+				+ lineSeparator + "this.view = view || 'default';"
+				+ lineSeparator + "this.closed_width = closed_width;"
+				+ lineSeparator + "this.open_width = open_width;"
+				+ lineSeparator + "this.start_closed = start_closed;"
+				+ lineSeparator + "this.chrome_id = chrome_id;" + lineSeparator
+				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
+				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
+		for (String key : getPubsubData().keySet()) {
+			gadgetScriptText += "my.pubsubData['" + key + "'] = '"
+					+ getPubsubData().get(key) + "';" + lineSeparator;
+		}
+		gadgetScriptText += "my.openSocialURL = '"
+				+ configuration.getProperty("OpenSocialURL") + "';"
+				+ lineSeparator + "my.debug = " + (isDebug() ? "1" : "0") + ";"
+				+ lineSeparator + "my.noCache = " + (noCache() ? "1" : "0")
+				+ ";" + lineSeparator + "my.gadgets = [";
+		for (PreparedGadget gadget : getVisibleGadgets()) {
+			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
+					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
+					+ gadget.getSecurityToken() + "','" + gadget.getView()
+					+ "'," + gadget.getClosedWidth() + ","
+					+ gadget.getOpenWidth() + ","
+					+ (gadget.getStartClosed() ? "1" : "0") + ",'"
+					+ gadget.getChromeId() + "','"
+					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
+		}
+		gadgetScriptText = gadgetScriptText.substring(0,
+				gadgetScriptText.length() - 2)
+				+ "];"
+				+ lineSeparator
+				+ "</script>"
+				+ lineSeparator
+				+ "<script type=\"text/javascript\" src=\"Scripts/profilesShindig.js\"></script>";
+
+		// ((System.Web.UI.WebControls.Literal)pnlOpenSocialScripts.FindControl("GadgetJavascriptLiteral")).Text
+		// = gadgetScriptText;
+
+		return gadgetScriptText;
 	}
 }
