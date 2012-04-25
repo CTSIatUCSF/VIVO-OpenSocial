@@ -1,0 +1,16 @@
+Notes by Eric Meeks
+To set up in Eclipse.
+
+1. Get source from GitHub
+2. Create workspace above VIVO-OpenSocial directory
+3. File->New->Project...Java Project 
+		Choose VIVO-OpenSocial or just type it in
+4. Accept all defaults
+5. After things settle down, remove vitro-core sources
+6. Add vitro-core as a separate project.  
+	In the File->New->Project...Java Project you will need to unclick use default
+	location and browse to vitro-core
+6. In VIVO-OpenSocial go to Properties and add vitro-core as a dependency in
+	the Java Build Path (Required projects on the build path)
+7. If needed edit web.xml for vivosolr.  Copy solr/home from context.xml 
+	into obvious location in web.xml and uncomment. 

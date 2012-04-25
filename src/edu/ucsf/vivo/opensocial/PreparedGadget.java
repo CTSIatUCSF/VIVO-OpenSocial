@@ -84,7 +84,7 @@ public class PreparedGadget {
 		GadgetViewRequirements reqs = getGadgetViewRequirements();
 		// if the page specific reqs are present, honor those. Otherwise defaut
 		// to true for regular gadgets, false for sandbox gadgets
-		return reqs != null ? reqs.getStartClosed() : !gadgetSpec.FromSandbox();
+		return reqs != null ? reqs.getStartClosed() : !gadgetSpec.fromSandbox();
 	}
 
 	public String getChromeId() {

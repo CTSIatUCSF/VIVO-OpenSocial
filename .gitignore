@@ -11,6 +11,7 @@ deploy.properties
 target
 MANIFEST.MF
 /bin
+/vitro-core/bin
 
 # output of git svn show-ignore below
 # /
