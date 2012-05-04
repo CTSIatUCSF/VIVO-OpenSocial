@@ -48,9 +48,9 @@ public class OpenSocialController {
 	private BasicDataSource dataSource;
 
 	public OpenSocialController(VitroRequest vreq) throws SQLException, IOException {
-		this.isDebug = vreq.getSession() != null
+		this.isDebug = true;/*vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
-						OPENSOCIAL_DEBUG));
+						OPENSOCIAL_DEBUG));*/
 		this.noCache = vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
 						OPENSOCIAL_NOCACHE));
