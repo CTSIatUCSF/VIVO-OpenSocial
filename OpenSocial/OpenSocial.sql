@@ -73,8 +73,7 @@ CREATE TABLE IF NOT EXISTS `shindig_app_views` (
   `open_width` int(11) default NULL,
   `start_closed` tinyint(1) default NULL,
   `chromeId` varchar(50) default NULL,
-  `display_order` int(11) default NULL,
-  UNIQUE KEY `appid` (`appid`)
+  `display_order` int(11) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -141,7 +140,32 @@ BEGIN
 		CALL shindig_registerAppPerson(uid, aid, 0);
 	END IF;
 END // 
-DELIMITER ;				
+DELIMITER ;
+
+/********** Add some gadgets to play with ********************/
+
+--delete from shindig_apps;
+insert shindig_apps values (100, 'Google Search', 'http://dev-profiles.ucsf.edu/apps/GoogleSearch.xml', NULL, 1, NULL);
+insert shindig_apps values (101, 'Featured Presentations', 'http://dev-profiles.ucsf.edu/apps/SlideShare.xml', NULL, 1, NULL);
+insert shindig_apps values (102, 'Faculty Mentor', 'http://dev-profiles.ucsf.edu/apps/Mentor.xml', NULL, 1, NULL);
+insert shindig_apps values (103, 'Websites', 'http://dev-profiles.ucsf.edu/apps/Links.xml', NULL, 1, NULL);
+insert shindig_apps values (104, 'Profile List', 'http://dev-profiles.ucsf.edu/apps/ProfileListTool.xml', NULL, 1, 'JSONPersonIds');
+insert shindig_apps values (105, 'Publication Export', 'http://dev-profiles.ucsf.edu/apps/PubExportTool.xml', NULL, 1, 'JSONPubMedIds');
+
+insert shindig_app_views values (100, NULL, NULL, 'Search.aspx', NULL, 600, 600, 1, 'gadgets-search', NULL);
+insert shindig_app_views values (101, NULL, 'R', '/display', 'profile', 291, 590, 1, 'gadgets-view', 3);
+insert shindig_app_views values (101, NULL, NULL, '/editForm', 'home', 700,700, 1, 'gadgets-edit', NULL);
+insert shindig_app_views values (102, NULL, 'R', '/display', 'profile', 291, 590, 1, 'gadgets-view', 2);
+insert shindig_app_views values (102, NULL, NULL, '/editForm', 'home', 700, 700, 1, 'gadgets-edit', NULL);
+insert shindig_app_views values (103, NULL, NULL, '/editForm', 'home', 700, 700, 1, 'gadgets-edit', NULL);
+insert shindig_app_views values (103, NULL, 'R', '/display', 'profile', 291, 590, 0, 'gadgets-view', 1);
+insert shindig_app_views values (104, 'U', NULL, 'Search.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL);
+insert shindig_app_views values (104, 'U', NULL, 'GadgetDetails.aspx', 'canvas', 700, 700, 0, 'gadgets-detail', NULL);
+insert shindig_app_views values (104, 'U', NULL, 'SimilarPeople.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL);
+insert shindig_app_views values (104, 'U', NULL, '/display', 'small', 160, 160, 0, 'gadgets-tools', NULL);
+insert shindig_app_views values (104, 'U', NULL, 'CoAuthors.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL);
+insert shindig_app_views values (105, 'U', NULL, '/display', 'small', 160, 160, 0, 'gadgets-tools', NULL);
+insert shindig_app_views values (105, 'U', NULL, 'GadgetDetails.aspx', 'canvas', 700, 700, 0, 'gadgets-detail', NULL);
 
 
 

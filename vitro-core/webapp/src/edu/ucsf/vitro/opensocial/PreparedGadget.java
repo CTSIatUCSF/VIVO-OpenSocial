@@ -57,9 +57,9 @@ public class PreparedGadget {
 		}
 		// default behavior that will get invoked when there is no reqs. Useful
 		// for sandbox gadgets
-		else if (helper.getPageName().equals("ProfileEdit.aspx")) {
+		else if (helper.getPageName().equals("/editForm")) {
 			return "home";
-		} else if (helper.getPageName().equals("ProfileDetails.aspx")) {
+		} else if (helper.getPageName().equals("/display")) {
 			return "profile";
 		} else if (helper.getPageName().equals("GadgetDetails.aspx")) {
 			return "canvas";
@@ -96,9 +96,9 @@ public class PreparedGadget {
 		// for sandbox gadgets
 		else if (gadgetSpec.getGadgetURL().contains("Tool")) {
 			return "gadgets-tools";
-		} else if (helper.getPageName().equals("ProfileEdit.aspx")) {
+		} else if (helper.getPageName().equals("/editForm")) {
 			return "gadgets-edit";
-		} else if (helper.getPageName().equals("ProfileDetails.aspx")) {
+		} else if (helper.getPageName().equals("/display")) {
 			return "gadgets-view";
 		} else if (helper.getPageName().equals("GadgetDetails.aspx")) {
 			return "gadgets-detail";

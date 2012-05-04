@@ -77,12 +77,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </form>
         </fieldset>
     </section>
-
-	<#-- VIVO OpenSocial Extension by UCSF -->
-	<#if openSocial??>
-		<#if openSocial.visible>
-			${scripts.add('${openSocial.javascript}')}
-		</#if>	
-	</#if>	
     
 </header>

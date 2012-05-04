@@ -125,7 +125,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <#assign researchAreas = propertyGroups.pullProperty("${core}hasResearchArea")!> 
         <#if researchAreas?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
             <@p.objectPropertyListing researchAreas editable />
-        </#if>   
+        </#if>
+
+		<#-- VIVO OpenSocial Extension by UCSF -->
+		<#if openSocial??>
+			<#if openSocial.visible>
+				${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/openSocial/gadgets.css" />')}			
+				${headScripts.add('<script type="text/javascript" src="${openSocial.containerJavascriptSrc}"></script>',
+								  '<script type="text/javascript" language="javascript">${openSocial.gadgetJavascript}</script>',
+								  '<script type="text/javascript" src="${urls.base}/js/openSocial/shindig.js"></script>')}
+	            <script type="text/javascript" language="javascript">
+	                my.current_view = "profile";
+	            </script>                
+	            <div id="gadgets-view" class="gadgets-gadget-parent"></div>
+            </#if>	
+		</#if>	
+           
     </section>
     
 </section>
@@ -158,4 +173,5 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/in
               '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}
-              
+
+             

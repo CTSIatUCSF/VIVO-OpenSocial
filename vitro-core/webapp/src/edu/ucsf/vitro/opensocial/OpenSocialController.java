@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,13 +106,13 @@ public class OpenSocialController {
 			rset = stmt.executeQuery(sqlCommand);
 
 			while (rset.next()) {
-				GadgetSpec spec = new GadgetSpec(rset.getInt(0),
-						rset.getString(1), rset.getString(2), rset.getString(3));
+				GadgetSpec spec = new GadgetSpec(rset.getInt(1),
+						rset.getString(2), rset.getString(3), rset.getString(4));
 				String gadgetFileName = getGadgetFileNameFromURL(rset
-						.getString(2));
+						.getString(3));
 
 				dbApps.put(gadgetFileName, spec);
-				if (requestAppId != null || rset.getBoolean(4)) {
+				if (requestAppId != null || rset.getBoolean(5)) {
 					officialApps.put(gadgetFileName, spec);
 				}
 			}
@@ -147,7 +148,7 @@ public class OpenSocialController {
 								// appId, otherwise generate one
 				String gadgetFileName = getGadgetFileNameFromURL(openSocialGadgetURL);
 				String name = gadgetFileName;
-				String[] channels = new String[0];
+				List<String> channels = new ArrayList<String>();
 				boolean sandboxOnly = true;
 				if (dbApps.containsKey(gadgetFileName)) {
 					appId = dbApps.get(gadgetFileName).getAppId();
@@ -314,12 +315,6 @@ public class OpenSocialController {
 		return pageName;
 	}
 
-	public String getContainerJavascriptSrc() {
-		return configuration.getProperty("OpenSocial.url")
-				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:shindig-container.js?c=1"
-				+ (isDebug ? "&debug=1" : "");
-	}
-
 	public String getIdToUrlMapJavascript() {
 		String retval = "var idToUrlMap = {";
 		for (PreparedGadget gadget : gadgets) {
@@ -395,29 +390,22 @@ public class OpenSocialController {
 		String page = "";
 
 		// The following will block until the page is transmitted.
-		do {
-			bytes = s.getInputStream().read(bytesReceived);
-			page = page + new String(bytesReceived);
-		} while (bytes > 0);
+		while ((bytes = s.getInputStream().read(bytesReceived)) > 0) {
+			page += new String(bytesReceived, 0, bytes);
+		};
 
 		return page;
 	}
 	
-	public Map<String, Object> getFreemarkerData() {
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("visible", isVisible());
-		data.put("javascript", getJavascript());
-		return data;
+	public String getContainerJavascriptSrc() {
+		return configuration.getProperty("OpenSocial.url")
+				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:shindig-container.js?c=1"
+				+ (isDebug ? "&debug=1" : "");
 	}
 
-	public String getJavascript() {
+	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
-		String gadgetScriptText = "<script type=\"text/javascript\" src=\""
-				+ getContainerJavascriptSrc()
-				+ "\"></script>"
-				+ lineSeparator
-				+ "<script type=\"text/javascript\" language=\"javascript\">"
-				+ lineSeparator
+		String gadgetScriptText = lineSeparator
 				+ "var my = {};"
 				+ lineSeparator
 				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
@@ -453,13 +441,7 @@ public class OpenSocialController {
 		gadgetScriptText = gadgetScriptText.substring(0,
 				gadgetScriptText.length() - 2)
 				+ "];"
-				+ lineSeparator
-				+ "</script>"
-				+ lineSeparator
-				+ "<script type=\"text/javascript\" src=\"Scripts/profilesShindig.js\"></script>";
-
-		// ((System.Web.UI.WebControls.Literal)pnlOpenSocialScripts.FindControl("GadgetJavascriptLiteral")).Text
-		// = gadgetScriptText;
+				+ lineSeparator;
 
 		return gadgetScriptText;
 	}

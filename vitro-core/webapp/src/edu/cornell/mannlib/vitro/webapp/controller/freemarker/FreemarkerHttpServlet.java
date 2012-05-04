@@ -293,6 +293,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         try {
 	        OpenSocialController openSocialController = new OpenSocialController(vreq);
 	        templateDataModel.put("openSocial", openSocialController);
+	        if (openSocialController.isVisible()) {
+	        	templateDataModel.put("bodyOnload", "my.init();");
+	        }
         } catch (IOException e) {
             log.error("IOException in doTemplate()", e);
         } catch (SQLException e) {

@@ -22,22 +22,21 @@ public class GadgetSpec {
 
 	// For preloading
 	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			String[] channels) {
+			List<String> channels) {
 		this.appId = appId;
 		this.name = name;
 		this.openSocialGadgetURL = openSocialGadgetURL;
-		this.channels.addAll(Arrays.asList(channels));
+		this.channels.addAll(channels);
 	}
-
+	
 	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
 			String channelsStr) {
-		this(appId, name, openSocialGadgetURL, channelsStr != null
-				&& channelsStr.length() > 0 ? channelsStr.split(" ")
-				: new String[0]);
+		this(appId, name, openSocialGadgetURL, Arrays.asList(channelsStr != null
+				&& channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]));
 	}
 
 	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			String[] channels, boolean fromSandbox, BasicDataSource ds)
+			List<String> channels, boolean fromSandbox, BasicDataSource ds)
 			throws SQLException {
 		this(appId, name, openSocialGadgetURL, channels);
 		this.fromSandbox = fromSandbox;
@@ -48,19 +47,19 @@ public class GadgetSpec {
 			ResultSet rset = null;
 
 			try {
-				String sqlCommand = "select page, viewer_req, owner_req, [view], closed_width, open_width, start_closed, chromeId, display_order from shindig_app_views where appId = "
+				String sqlCommand = "select page, viewer_req, owner_req, view, closed_width, open_width, start_closed, chromeId, display_order from shindig_app_views where appId = "
 						+ appId;
 				conn = ds.getConnection();
 				stmt = conn.createStatement();
 				rset = stmt.executeQuery(sqlCommand);
 				while (rset.next()) {
 					viewRequirements.put(
-							rset.getString(0),
-							new GadgetViewRequirements(rset.getString(0), rset
-									.getString(1), rset.getString(2), rset
-									.getString(3), rset.getInt(4), rset
-									.getInt(5), rset.getBoolean(6), rset
-									.getString(7), rset.getInt(8)));
+							rset.getString(1),
+							new GadgetViewRequirements(rset.getString(1), rset
+									.getString(2), rset.getString(3), rset
+									.getString(4), rset.getInt(5), rset
+									.getInt(6), rset.getBoolean(7), rset
+									.getString(8), rset.getInt(9)));
 				}
 			} finally {
 				try {
@@ -91,8 +90,8 @@ public class GadgetSpec {
 		return openSocialGadgetURL;
 	}
 
-	public String[] getChannels() {
-		return (String[]) channels.toArray();
+	public List<String> getChannels() {
+		return channels;
 	}
 
 	public boolean listensTo(String channel) { // if fromSandbox just say yes,
@@ -150,7 +149,7 @@ public class GadgetSpec {
 			stmt = conn.createStatement();
 			rset = stmt.executeQuery(sqlCommand);
 			while (rset.next()) {
-				count = rset.getInt(0);
+				count = rset.getInt(1);
 			}
 		} finally {
 			try {
@@ -176,7 +175,7 @@ public class GadgetSpec {
 
 	// who sees it? Return the viewerReq for the ProfileDetails page
 	public char getVisibleScope() {
-		GadgetViewRequirements req = getGadgetViewRequirements("ProfileDetails.aspx");
+		GadgetViewRequirements req = getGadgetViewRequirements("/display");
 		return req != null ? req.getViewerReq() : ' ';
 	}
 
