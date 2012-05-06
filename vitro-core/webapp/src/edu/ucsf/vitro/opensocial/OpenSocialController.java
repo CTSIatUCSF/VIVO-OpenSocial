@@ -376,7 +376,6 @@ public class OpenSocialController {
 				"OpenSocial.tokenService").split(":");
 		String request = "c=default&v=" + viewer + "&o=" + owner + "&g="
 				+ gadget + "\r\n";
-		byte[] bytesReceived = new byte[256];
 
 		// Create a socket connection with the specified server and port.
 		Socket s = new Socket(tokenService[0],
@@ -385,9 +384,10 @@ public class OpenSocialController {
 		// Send request to the server.
 		s.getOutputStream().write(request.getBytes());
 
-		// Receive the server home page content.
+		// Receive the encoded content.
 		int bytes = 0;
 		String page = "";
+		byte[] bytesReceived = new byte[256];
 
 		// The following will block until the page is transmitted.
 		while ((bytes = s.getInputStream().read(bytesReceived)) > 0) {

@@ -4,7 +4,7 @@
 --
 
 CREATE TABLE IF NOT EXISTS `shindig_activity` (
-  `activityId` int(11) NOT NULL,
+  `activityId` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) default NULL,
   `appId` int(11) default NULL,
   `createdDT` datetime default NULL,
