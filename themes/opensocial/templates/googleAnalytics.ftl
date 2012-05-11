@@ -26,38 +26,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+<#-- NOTICE: This is SAMPLE Google Analytics code. You must replace it with your institution's code. 
+Please see documentation at https://confluence.cornell.edu/display/ennsrd/Google+Analytics+for+UI. -->
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <#include "head.ftl">
-    </head>
-    
-    <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        
-        <#include "menu.ftl">
-        
-            <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
-                
-                <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
-                <p>With Vitro, you can:</p>
-                
-                <ul>
-                    <li>Create or load ontologies in OWL format</li>
-                    <li>Edit instances and relationships</li>
-                    <li>Build a public web site to display your data</li>
-                    <li>Search your data</li>
-                </ul>
-            </section> <!-- #intro -->
-            
-            <@widget name="login" />
-            
-            <@allClassGroups vClassGroups />
-        
-        <#include "footer.ftl">
-    </body>
-</html>
+<#--
+<script type="text/javascript">  
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); 
+</script>  
+
+<script type="text/javascript">  
+    try { 
+        var pageTracker = _gat._getTracker("UA-5164622-5");
+        pageTracker._setDomainName("vivo.cornell.edu");
+        pageTracker._setAllowLinker(true);
+        pageTracker._trackPageview();
+         
+        var rollupTracker = _gat._getTracker("UA-12531954-1");
+        rollupTracker._setDomainName("none"); 
+        rollupTracker._setAllowLinker(true);
+        rollupTracker._trackPageview(location.host+location.pathname);  
+} 
+
+catch(err) {}  
+</script>
+-->

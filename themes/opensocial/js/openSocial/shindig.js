@@ -370,7 +370,7 @@ ProfilesGadget.prototype.handleToggle = function() {
       //OPEN
       gadgetContent.parentNode.style.width = (my.gadgets[this.id].open_width || 600) + 'px';
       gadgetContent.style.display = ''; 
-      gadgetImg.src = '../images/openSocial/icon_squareDownArrow.gif';
+      gadgetImg.src = '../themes/opensocial/images/openSocial/icon_squareDownArrow.gif';
       // refresh if certain features require so
       //if (this.hasFeature('dynamic-height')) {
 	  if (my.gadgets[this.id].chrome_id == 'gadgets-search') {
@@ -396,7 +396,7 @@ ProfilesGadget.prototype.handleToggle = function() {
       //CLOSE
       gadgetContent.parentNode.style.width = (my.gadgets[this.id].closed_width || 600) + 'px';
       gadgetContent.style.display = 'none'; 
-      gadgetImg.src = '../images/openSocial/icon_squareArrow.gif';
+      gadgetImg.src = '../themes/opensocial/images/openSocial/icon_squareArrow.gif';
  	  if (my.gadgets[this.id].view == 'home') {
       	// record in google analytics     
         _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE_IN_EDIT', 'profile_edit_view']);  

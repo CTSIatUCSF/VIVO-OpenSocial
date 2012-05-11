@@ -26,38 +26,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+</div> <!-- #wrapper-content -->
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <#include "head.ftl">
-    </head>
+<footer role="contentinfo">
+    <p class="copyright">
+        <#if copyright??>
+            <small>&copy;${copyright.year?c}
+            <#if copyright.url??>
+                <a href="${copyright.url}" title="copyright">${copyright.text}</a>
+            <#else>
+                ${copyright.text}
+            </#if>
+             | <a class="terms" href="${urls.termsOfUse}" title="terms of use">Terms of Use</a></small> | 
+        </#if>
+        Powered by <a class="powered-by-vivo" href="http://vivoweb.org" target="_blank" title="powered by VIVO"><strong>VIVO</strong></a>
+        <#if user.hasRevisionInfoAccess>
+             | Version <a href="${version.moreInfoUrl}" title="version">${version.label}</a>
+        </#if>
+    </p>
     
-    <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        
-        <#include "menu.ftl">
-        
-            <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
-                
-                <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
-                <p>With Vitro, you can:</p>
-                
-                <ul>
-                    <li>Create or load ontologies in OWL format</li>
-                    <li>Edit instances and relationships</li>
-                    <li>Build a public web site to display your data</li>
-                    <li>Search your data</li>
-                </ul>
-            </section> <!-- #intro -->
-            
-            <@widget name="login" />
-            
-            <@allClassGroups vClassGroups />
-        
-        <#include "footer.ftl">
-    </body>
-</html>
+    <nav role="navigation">
+        <ul id="footer-nav" role="list">
+            <li role="listitem"><a href="${urls.about}" title="about">About</a></li>
+            <#if urls.contact??>
+                <li role="listitem"><a href="${urls.contact}" title="contact us">Contact Us</a></li>
+            </#if> 
+            <li role="listitem"><a href="http://www.vivoweb.org/support" target="blank" title="support">Support</a></li>
+        </ul>
+    </nav>
+</footer>
+
+<#include "scripts.ftl">

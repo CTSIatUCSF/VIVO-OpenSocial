@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,7 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
+import edu.ucsf.vitro.opensocial.OpenSocialManager;
 
 /**
  * Handles requests for entity information.
@@ -175,6 +177,19 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        
 	        //If special values required for individuals like menu, include values in template values
 	        body.putAll(getSpecialEditingValues(vreq));
+	        
+	        // VIVO OpenSocial Extension by UCSF
+	        try {
+		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, itm.isEditable() ? "individual-EDIT-MODE" : "individual", itm.isEditable());
+		        body.put("openSocial", openSocialManager);
+		        if (openSocialManager.isVisible()) {
+		        	body.put("bodyOnload", "my.init();");
+		        }
+	        } catch (IOException e) {
+	            log.error("IOException in doTemplate()", e);
+	        } catch (SQLException e) {
+	            log.error("SQLException in doTemplate()", e);
+	        }	               
 	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                

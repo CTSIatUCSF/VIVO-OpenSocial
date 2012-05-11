@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController;
 
-public class OpenSocialController {
+public class OpenSocialManager {
 	public static final String OPENSOCIAL_DEBUG = "OPENSOCIAL_DEBUG";
 	public static final String OPENSOCIAL_NOCACHE = "OPENSOCIAL_NOCACHE";
 	public static final String OPENSOCIAL_GADGETS = "OPENSOCIAL_GADGETS";
@@ -47,14 +47,14 @@ public class OpenSocialController {
 
 	private BasicDataSource dataSource;
 
-	public OpenSocialController(VitroRequest vreq) throws SQLException, IOException {
+	public OpenSocialManager(VitroRequest vreq, String pageName, boolean editMode) throws SQLException, IOException {
 		this.isDebug = true;/*vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
 						OPENSOCIAL_DEBUG));*/
 		this.noCache = vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
 						OPENSOCIAL_NOCACHE));
-		this.pageName = "" + vreq.getServletPath(); // http://www.exampledepot.com/egs/javax.servlet/GetReqUrl.html
+		this.pageName = pageName;
 
 		configuration = ConfigurationProperties.getBean(vreq.getSession()
 				.getServletContext());
@@ -65,14 +65,25 @@ public class OpenSocialController {
 		}
 		String defaultNamespace = configuration
 				.getProperty("Vitro.defaultNamespace");
-		UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
-		this.viewerId = viewer != null ? Integer.parseInt(viewer.getUri()
-				.substring(defaultNamespace.length() + 1)) : -1;
-
 		Individual owner = IndividualController.getIndividualFromRequest(vreq);
-		this.ownerId = owner != null ? Integer.parseInt(owner.getLocalName().substring(1))
+		try {
+			this.ownerId = owner != null ? Integer.parseInt(owner.getLocalName().substring(1))
 				: -1;
+		} catch (NumberFormatException e) {
+			this.ownerId = -1;
+		}
 
+		// in editMode we need to set the viewer to be the same as the owner
+		// otherwise, the gadget will not be able to save appData correctly
+		if (editMode) {
+			this.viewerId = ownerId;
+		}
+		else {
+			UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
+			this.viewerId = viewer != null ? Integer.parseInt(viewer.getUri()
+					.substring(defaultNamespace.length() + 1)) : -1;
+		}
+		
 		Random random = new Random();
 
 		boolean gadgetLogin = pageName.contains("gadgetlogin");

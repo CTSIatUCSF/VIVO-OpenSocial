@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <#include "head.ftl">
 
-<body class="${bodyClasses!}" onload="${bodyOnload!}">
+<body class="${bodyClasses!}">
     <div id="wrap" class="container">
         <div id="header">
         

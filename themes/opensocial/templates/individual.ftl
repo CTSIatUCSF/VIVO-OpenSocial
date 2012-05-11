@@ -26,38 +26,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+<#-- Default VIVO individual profile page template (extends individual.ftl in vitro) -->
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <#include "head.ftl">
-    </head>
-    
-    <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        
-        <#include "menu.ftl">
-        
-            <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
-                
-                <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
-                <p>With Vitro, you can:</p>
-                
-                <ul>
-                    <li>Create or load ontologies in OWL format</li>
-                    <li>Edit instances and relationships</li>
-                    <li>Build a public web site to display your data</li>
-                    <li>Search your data</li>
-                </ul>
-            </section> <!-- #intro -->
-            
-            <@widget name="login" />
-            
-            <@allClassGroups vClassGroups />
-        
-        <#include "footer.ftl">
-    </body>
-</html>
+<#include "individual-setup.ftl">
+<#import "lib-vivo-properties.ftl" as vp>
+
+<#assign individualProductExtension>
+    <#-- Include for any class specific template additions -->
+    ${classSpecificExtension!}
+    <@vp.webpages propertyGroups editable />
+    <!--PREINDIVIDUAL OVERVIEW.FTL-->
+    <#include "individual-overview.ftl">
+        </section> <!-- #individual-info -->
+    </section> <!-- #individual-intro -->
+    <!--postindiviudal overiew tfl-->
+</#assign>
+
+<#include "individual-vitro.ftl">
+
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual-vivo.css" />')}
+
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.truncator.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/individualUtils.js"></script>')}

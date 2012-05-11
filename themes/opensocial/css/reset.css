@@ -1,4 +1,4 @@
-<#--
+/*
 Copyright (c) 2012, Cornell University
 All rights reserved.
 
@@ -24,40 +24,105 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
+*/
 
-<@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+/* CSS Document 
+CSS reste by Eric Meyer:
+The goal of a reset stylesheet is to reduce browser inconsistencies in things like default line heights, margins and font sizes of headings, and so on...  http://meyerweb.com/eric/tools/css/reset/
+*/
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <#include "head.ftl">
-    </head>
-    
-    <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        
-        <#include "menu.ftl">
-        
-            <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
-                
-                <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
-                <p>With Vitro, you can:</p>
-                
-                <ul>
-                    <li>Create or load ontologies in OWL format</li>
-                    <li>Edit instances and relationships</li>
-                    <li>Build a public web site to display your data</li>
-                    <li>Search your data</li>
-                </ul>
-            </section> <!-- #intro -->
-            
-            <@widget name="login" />
-            
-            <@allClassGroups vClassGroups />
-        
-        <#include "footer.ftl">
-    </body>
-</html>
+html,
+body,
+div,
+span,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+code,
+del,
+dfn,
+em,
+img,
+q,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+    color: #595b5b;
+    font-weight: normal;
+}
+body {    
+    line-height: 1.5em;
+}
+ol,
+ul {
+    list-style: none;
+    font-weight: normal;
+}
+blockquote,
+q {    
+    quotes: none; 
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+/* remember to highlight inserts somehow! */
+ins {    
+    text-decoration: none; 
+}
+del {    
+    text-decoration: line-through; 
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+/* New ones added to the default list */
+a {    
+    text-decoration: none; 
+}
+fieldset {    
+    border-style: none; 
+}
+legend {    
+    display: none; 
+}

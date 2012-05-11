@@ -26,38 +26,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+<nav role="navigation">
+    <ul id="main-nav" role="list">
+        <#list menu.items as item>
+            <li role="listitem"><a href="${item.url}" title="menu item" <#if item.active> class="selected" </#if>>${item.linkText}</a></li>
+        </#list>
+    </ul>
+</nav>
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <#include "head.ftl">
-    </head>
+<div id="wrapper-content" role="main">        
+    <#if flash?has_content>
+        <#if flash?starts_with("Welcome") >
+            <section  id="welcome-msg-container" role="container">
+                <section  id="welcome-message" role="alert">${flash}</section>
+            </section>
+        <#else>
+            <section id="flash-message" role="alert">
+                ${flash}
+            </section>
+        </#if>
+    </#if>
     
-    <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        
-        <#include "menu.ftl">
-        
-            <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
-                
-                <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
-                <p>With Vitro, you can:</p>
-                
-                <ul>
-                    <li>Create or load ontologies in OWL format</li>
-                    <li>Edit instances and relationships</li>
-                    <li>Build a public web site to display your data</li>
-                    <li>Search your data</li>
-                </ul>
-            </section> <!-- #intro -->
-            
-            <@widget name="login" />
-            
-            <@allClassGroups vClassGroups />
-        
-        <#include "footer.ftl">
-    </body>
-</html>
+    <!--[if lte IE 8]>
+    <noscript>
+        <p class="ie-alert">This site uses HTML elements that are not recognized by Internet Explorer 8 and below in the absence of JavaScript. As a result, the site will not be rendered appropriately. To correct this, please either enable JavaScript, upgrade to Internet Explorer 9, or use another browser. Here are the <a href="http://www.enable-javascript.com"  title="java script instructions">instructions for enabling JavaScript in your web browser</a>.</p>
+    </noscript>
+    <![endif]-->

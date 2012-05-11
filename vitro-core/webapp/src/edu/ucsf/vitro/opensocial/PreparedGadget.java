@@ -2,11 +2,11 @@ package edu.ucsf.vitro.opensocial;
 
 public class PreparedGadget {
 	private GadgetSpec gadgetSpec;
-	private OpenSocialController helper;
+	private OpenSocialManager helper;
 	private int moduleId;
 	private String securityToken;
 
-	public PreparedGadget(GadgetSpec gadgetSpec, OpenSocialController helper,
+	public PreparedGadget(GadgetSpec gadgetSpec, OpenSocialManager helper,
 			int moduleId, String securityToken) {
 		this.gadgetSpec = gadgetSpec;
 		this.helper = helper;

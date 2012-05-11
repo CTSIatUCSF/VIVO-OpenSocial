@@ -33,7 +33,6 @@ import static javax.mail.Message.RecipientType.TO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.Calendar;
 
 import java.util.Date;
@@ -69,7 +68,6 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
-import edu.ucsf.vitro.opensocial.OpenSocialController;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -289,19 +287,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // level.
         templateDataModel.putAll(values.getMap());
         
-        // VIVO OpenSocial Extension by UCSF
-        try {
-	        OpenSocialController openSocialController = new OpenSocialController(vreq);
-	        templateDataModel.put("openSocial", openSocialController);
-	        if (openSocialController.isVisible()) {
-	        	templateDataModel.put("bodyOnload", "my.init();");
-	        }
-        } catch (IOException e) {
-            log.error("IOException in doTemplate()", e);
-        } catch (SQLException e) {
-            log.error("SQLException in doTemplate()", e);
-        }
-                
         // If a body template is specified, merge it with the template data model.
         String bodyString;
         String bodyTemplate = values.getTemplateName();        
@@ -325,7 +310,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException { 
         String redirectUrl = values.getRedirectUrl();
-        if( values.getStatusCode() == 0 || values.getStatusCode() == response.SC_FOUND ){
+        if( values.getStatusCode() == 0 || values.getStatusCode() == HttpServletResponse.SC_FOUND ){
             setResponseStatus(response, values.getStatusCode());
             response.sendRedirect(redirectUrl);
         }else{
