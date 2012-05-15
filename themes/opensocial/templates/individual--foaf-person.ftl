@@ -130,14 +130,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<#-- VIVO OpenSocial Extension by UCSF -->
 		<#if openSocial??>
 			<#if openSocial.visible>
-				${stylesheets.add('<link rel="stylesheet" href="${urls.base}/themes/opensocial/css/openSocial/gadgets.css" />')}			
-				${headScripts.add('<script type="text/javascript" src="${openSocial.containerJavascriptSrc}"></script>',
-								  '<script type="text/javascript" language="javascript">${openSocial.gadgetJavascript}</script>',
-								  '<script type="text/javascript" src="${urls.base}/themes/opensocial/js/openSocial/shindig.js"></script>')}
-	            <script type="text/javascript" language="javascript">
-	                my.current_view = "profile";
-	            </script>                
-	            <div id="gadgets-individual" class="gadgets-gadget-parent"></div>
+				<#-- It would likely make sense to remove the #if logic as it is safe and -->
+				<#-- arguably better to just have both divs in all conditions -->
+				<#if editable>								  
+	            	<div id="gadgets-edit" class="gadgets-gadget-parent"></div>
+	            <#else>
+	            	<div id="gadgets-view" class="gadgets-gadget-parent"></div>
+	            </#if>	            	
             </#if>	
 		</#if>	
            

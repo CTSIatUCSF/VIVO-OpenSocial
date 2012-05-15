@@ -38,6 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <#include "identity.ftl">
         
         <#include "menu.ftl">
+
+		<#-- VIVO OpenSocial Extension by UCSF -->
+		<#if openSocial??>
+			<#if openSocial.visible>
+            	<div id="gadgets-tools" class="gadgets-gadget-parent"></div>
+            </#if>	
+		</#if>	
         
         ${body}
         

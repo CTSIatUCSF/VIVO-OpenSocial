@@ -181,7 +181,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // VIVO OpenSocial Extension by UCSF
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, itm.isEditable() ? "individual-EDIT-MODE" : "individual", itm.isEditable());
-		        body.put("openSocial", openSocialManager);
+		        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+		        		OpenSocialManager.buildJSONPersonIds(individual, "1 person found"));
+		        body.put(OpenSocialManager.TAG_NAME, openSocialManager);
 		        if (openSocialManager.isVisible()) {
 		        	body.put("bodyOnload", "my.init();");
 		        }

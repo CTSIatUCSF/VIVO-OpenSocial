@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,6 +78,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
+import edu.ucsf.vitro.opensocial.OpenSocialManager;
 import freemarker.template.Configuration;
 
 /**
@@ -296,7 +298,24 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                         vreq.getServletPath(), pagingLinkParams));
             }
 
-            String template = templateTable.get(format).get(Result.PAGED);
+	        // VIVO OpenSocial Extension by UCSF
+	        try {
+		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "search");
+		        // put list of people found onto pubsub channel
+		        List<Integer> ids = OpenSocialManager.getOpenSocialId(individuals);
+		        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+		        		OpenSocialManager.buildJSONPersonIds(ids, "" + ids.size() + " people found"));
+		        body.put("openSocial", openSocialManager);
+		        if (openSocialManager.isVisible()) {
+		        	body.put("bodyOnload", "my.init();");
+		        }
+	        } catch (IOException e) {
+	            log.error("IOException in doTemplate()", e);
+	        } catch (SQLException e) {
+	            log.error("SQLException in doTemplate()", e);
+	        }	               
+
+	        String template = templateTable.get(format).get(Result.PAGED);
             
             return new TemplateResponseValues(template, body);
         } catch (Throwable e) {

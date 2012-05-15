@@ -57,11 +57,11 @@ public class PreparedGadget {
 		}
 		// default behavior that will get invoked when there is no reqs. Useful
 		// for sandbox gadgets
-		else if (helper.getPageName().equals("/editForm")) {
+		else if (helper.getPageName().equals("individual-EDIT-MODE")) {
 			return "home";
-		} else if (helper.getPageName().equals("/display")) {
+		} else if (helper.getPageName().equals("individual")) {
 			return "profile";
-		} else if (helper.getPageName().equals("GadgetDetails.aspx")) {
+		} else if (helper.getPageName().equals("gadgetDetails")) {
 			return "canvas";
 		} else if (gadgetSpec.getGadgetURL().contains("Tool")) {
 			return "small";
@@ -96,13 +96,13 @@ public class PreparedGadget {
 		// for sandbox gadgets
 		else if (gadgetSpec.getGadgetURL().contains("Tool")) {
 			return "gadgets-tools";
-		} else if (helper.getPageName().equals("/editForm")) {
+		} else if (helper.getPageName().equals("individual-EDIT-MODE")) {
 			return "gadgets-edit";
-		} else if (helper.getPageName().equals("/display")) {
+		} else if (helper.getPageName().equals("individual")) {
 			return "gadgets-view";
-		} else if (helper.getPageName().equals("GadgetDetails.aspx")) {
+		} else if (helper.getPageName().equals("gadgetDetails")) {
 			return "gadgets-detail";
-		} else if (helper.getPageName().equals("Search.aspx")) {
+		} else if (helper.getPageName().equals("search")) {
 			return "gadgets-search";
 		} else {
 			return null;
@@ -110,7 +110,7 @@ public class PreparedGadget {
 	}
 
 	public String getCanvasURL() {
-		return "~/GadgetDetails.aspx?appId=" + getAppId() + "&Person="
+		return "~/gadget?appId=" + getAppId() + "&Person="
 				+ helper.getOwnerId();
 	}
 

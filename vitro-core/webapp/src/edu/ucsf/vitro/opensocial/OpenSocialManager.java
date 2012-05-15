@@ -13,6 +13,8 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,6 +34,7 @@ public class OpenSocialManager {
 
 	public static final String JSON_PERSONID_CHANNEL = "JSONPersonIds";
 	public static final String JSON_PMID_CHANNEL = "JSONPubMedIds";
+	public static final String TAG_NAME = "openSocial";
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
 
@@ -47,6 +50,10 @@ public class OpenSocialManager {
 
 	private BasicDataSource dataSource;
 
+	public OpenSocialManager(VitroRequest vreq, String pageName) throws SQLException, IOException {
+		this(vreq, pageName, false);
+	}
+	
 	public OpenSocialManager(VitroRequest vreq, String pageName, boolean editMode) throws SQLException, IOException {
 		this.isDebug = true;/*vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
@@ -67,8 +74,7 @@ public class OpenSocialManager {
 				.getProperty("Vitro.defaultNamespace");
 		Individual owner = IndividualController.getIndividualFromRequest(vreq);
 		try {
-			this.ownerId = owner != null ? Integer.parseInt(owner.getLocalName().substring(1))
-				: -1;
+			this.ownerId = getOpenSocialId(owner);
 		} catch (NumberFormatException e) {
 			this.ownerId = -1;
 		}
@@ -250,23 +256,39 @@ public class OpenSocialManager {
 		return false;
 	}
 
-	// JSON Helper Functions
-	public static String buildJSONPersonIds(List<Integer> personIds,
-			String message) {
-		Map<String, Object> foundPeople = new HashMap<String, Object>();
-		foundPeople.put("personIds", personIds);
-		foundPeople.put("message", message);
-		// TODO find JavaScrprtSerializer
-		// JavaScriptSerializer serializer = new JavaScriptSerializer();
-		return "";// serializer.Serialize(foundPeople);
+	// uri to our INT based OpenSocial ID helper functions
+	public static int getOpenSocialId(Individual ind) {
+		return ind != null ? Integer.parseInt(ind.getLocalName().substring(1)) : -1;		
+	}
+	
+	public static List<Integer> getOpenSocialId(List<Individual> individuals) {
+		List<Integer> personIds = new ArrayList<Integer>();
+		for (Individual ind : individuals) {
+			personIds.add(getOpenSocialId(ind));
+		}
+		return personIds;
 	}
 
-	public static String buildJSONPersonIds(int personId, String message) {
+	// JSON Helper Functions
+	public static String buildJSONPersonIds(List<Integer> personIds,
+			String message) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("message", message);
+		json.put("personIds", personIds);
+		return json.toString();
+	}
+	
+	public static String buildJSONPersonIds(int personId, String message) throws JSONException {
 		List<Integer> personIds = new ArrayList<Integer>();
 		personIds.add(personId);
 		return buildJSONPersonIds(personIds, message);
 	}
 
+	public static String buildJSONPersonIds(Individual ind, String message) throws JSONException {
+		List<Integer> personIds = new ArrayList<Integer>();
+		personIds.add(getOpenSocialId(ind));
+		return buildJSONPersonIds(personIds, message);
+	}
 	/****
 	 * public static String BuildJSONPubMedIds(Person person) { List<Int32>
 	 * pubIds = new List<Int32>(); foreach (Publication pub in
@@ -351,31 +373,38 @@ public class OpenSocialManager {
 		return gadgets;
 	}
 
-	public static void postActivity(int userId, String title) {
+	public void postActivity(int userId, String title) throws SQLException {
 		postActivity(userId, title, null, null, null);
 	}
 
-	public static void postActivity(int userId, String title, String body) {
+	public void postActivity(int userId, String title, String body) throws SQLException {
 		postActivity(userId, title, body, null, null);
 	}
 
-	public static void postActivity(int userId, String title, String body,
-			String xtraId1Type, String xtraId1Value) {
-		// TODO
-		/**
-		 * try { Database db = DatabaseFactory.CreateDatabase();
-		 * 
-		 * string sqlCommand =
-		 * "INSERT INTO shindig_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ("
-		 * + userId +
-		 * ",'<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
-		 * + Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1,
-		 * 1)).TotalMilliseconds) +"</postedTime><title>" + title + "</title>" +
-		 * (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
-		 * + xtraId1Type + "','" + xtraId1Value + "');"; DbCommand dbCommand =
-		 * db.GetSqlStringCommand(sqlCommand); db.ExecuteNonQuery(dbCommand); }
-		 * catch (Exception e) { throw new Exception(e.Message); }
-		 **/
+	public void postActivity(int userId, String title, String body,
+			String xtraId1Type, String xtraId1Value) throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		String sqlCommand = "INSERT INTO shindig_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ("
+				+ userId +  ",'<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
+				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
+				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
+				+ xtraId1Type + "','" + xtraId1Value + "');";		
+		try {
+			conn = dataSource.getConnection();
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sqlCommand);
+		} finally {
+			try {
+				stmt.close();
+			} catch (Exception e) {
+			}
+			try {
+				conn.close();
+			} catch (Exception e) {
+			}
+		}
+			
 	}
 
 	private String socketSendReceive(int viewer, int owner, String gadget)

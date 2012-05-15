@@ -105,7 +105,7 @@ gadgets.pubsubrouter.init(function(id) {
       }
       else if (channel == 'profile') {
           _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'go_to_profile', message]);    
-          document.location.href = 'ProfileDetails.aspx?From=SE&Person=' + message;
+          document.location.href = '/' + location.pathname.split('/')[1] + '/display/n' + message;
 	  }
       else if (channel == 'JSONPersonIds' || channel == 'JSONPubMedIds') {
           // do nothing, no need to alert
@@ -284,17 +284,17 @@ ProfilesGadgetService.prototype.requestNavigateTo = function(view, opt_params) {
     // remove appId if present
     url = my.removeParameterFromURL(url, 'appId');
     
-    // Add appId if the URL Template begins with the word 'Gadget'
-    if (urlTemplate.indexOf('Gadget') == 0) {
+    // Add appId if the URL Template begins with the word 'gadget'
+    if (urlTemplate.toLowerCase().indexOf('gadget') == 0) {
         var moduleId = shindig.container.gadgetService.getGadgetIdFromModuleId(this.f);
         var appId = my.gadgets[moduleId].appId;
-        url += '&appId=' + appId;    
+        url += (url.indexOf('?') != url.length - 1 ? '&' : '') + 'appId=' + appId;    
     }
 
 	if (opt_params) {
 		var paramStr = gadgets.json.stringify(opt_params);
 		if (paramStr.length > 0) {
-			url += '&appParams=' + encodeURIComponent(paramStr);
+			url += (url.indexOf('?') != url.length  - 1 ? '&' : '') + 'appParams=' + encodeURIComponent(paramStr);
 		}
 	}
 	if (url && document.location.href.indexOf(url) == -1) {
@@ -370,7 +370,7 @@ ProfilesGadget.prototype.handleToggle = function() {
       //OPEN
       gadgetContent.parentNode.style.width = (my.gadgets[this.id].open_width || 600) + 'px';
       gadgetContent.style.display = ''; 
-      gadgetImg.src = '../themes/opensocial/images/openSocial/icon_squareDownArrow.gif';
+      gadgetImg.src = '/' + location.pathname.split('/')[1] + '/themes/opensocial/images/openSocial/icon_squareDownArrow.gif';
       // refresh if certain features require so
       //if (this.hasFeature('dynamic-height')) {
 	  if (my.gadgets[this.id].chrome_id == 'gadgets-search') {
@@ -396,7 +396,7 @@ ProfilesGadget.prototype.handleToggle = function() {
       //CLOSE
       gadgetContent.parentNode.style.width = (my.gadgets[this.id].closed_width || 600) + 'px';
       gadgetContent.style.display = 'none'; 
-      gadgetImg.src = '../themes/opensocial/images/openSocial/icon_squareArrow.gif';
+      gadgetImg.src = '/' + location.pathname.split('/')[1] + '/themes/opensocial/images/openSocial/icon_squareArrow.gif';
  	  if (my.gadgets[this.id].view == 'home') {
       	// record in google analytics     
         _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE_IN_EDIT', 'profile_edit_view']);  
@@ -421,7 +421,7 @@ ProfilesGadget.prototype.getTitleBarContent = function(continuation) {
       this.cssClassTitleButtonBar + '">' + 
       '<a href="#" onclick="shindig.container.getGadget(' + this.id +
       ').handleToggle();return false;" class="' + this.cssClassTitleButton +
-      '"><img id="gadgets-gadget-title-image-' + this.id + '" src="../images/openSocial/icon_squareDownArrow.gif"/></a></span> <span id="' +
+      '"><img id="gadgets-gadget-title-image-' + this.id + '" src="/' + location.pathname.split('/')[1] + '/images/openSocial/icon_squareDownArrow.gif"/></a></span> <span id="' +
       this.getIframeId() + '_title" class="' + this.cssClassTitle + '">' + 
   	  '<a href="#" onclick="shindig.container.getGadget(' + this.id + ').handleToggle();return false;">' + 
 	  (this.title ? this.title : 'Gadget') + '</a>' + '</span><span id="' + 

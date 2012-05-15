@@ -1318,6 +1318,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <url-pattern>/admin/getObjectClasses</url-pattern>
   </servlet-mapping>
 
+  <!-- VIVO OpenSocial Extension by UCSF -->
+  <servlet>
+    <servlet-name>GadgetDetailsController</servlet-name>
+    <servlet-class>edu.ucsf.vitro.opensocial.GadgetDetailsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GadgetDetailsController</servlet-name>
+    <url-pattern>/gadget</url-pattern>
+  </servlet-mapping>
+
   <!-- ==================== tag libraries ============================== -->
   <jsp-config>
     <taglib>
