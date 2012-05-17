@@ -75,11 +75,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<#-- VIVO OpenSocial Extension by UCSF -->
 		<#if openSocial??>
 			<#if openSocial.visible>
-				${stylesheets.add('<link rel="stylesheet" href="${urls.base}/themes/opensocial/css/openSocial/gadgets.css" />')}			
-				${headScripts.add('<script type="text/javascript" src="${openSocial.containerJavascriptSrc}"></script>',
-								  '<script type="text/javascript" language="javascript">${openSocial.gadgetJavascript}</script>',
-								  '<script type="text/javascript" src="${urls.base}/themes/opensocial/js/openSocial/shindig.js"></script>')}
-
 		        <script type="text/javascript" language="javascript">
 		            // find the 'Search' gadget(s).  
 		            var searchGadgets = my.findGadgetsAttachingTo("gadgets-search");

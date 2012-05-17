@@ -421,7 +421,7 @@ ProfilesGadget.prototype.getTitleBarContent = function(continuation) {
       this.cssClassTitleButtonBar + '">' + 
       '<a href="#" onclick="shindig.container.getGadget(' + this.id +
       ').handleToggle();return false;" class="' + this.cssClassTitleButton +
-      '"><img id="gadgets-gadget-title-image-' + this.id + '" src="/' + location.pathname.split('/')[1] + '/images/openSocial/icon_squareDownArrow.gif"/></a></span> <span id="' +
+      '"><img id="gadgets-gadget-title-image-' + this.id + '" src="/' + location.pathname.split('/')[1] + '/themes/opensocial/images/openSocial/icon_squareDownArrow.gif"/></a></span> <span id="' +
       this.getIframeId() + '_title" class="' + this.cssClassTitle + '">' + 
   	  '<a href="#" onclick="shindig.container.getGadget(' + this.id + ').handleToggle();return false;">' + 
 	  (this.title ? this.title : 'Gadget') + '</a>' + '</span><span id="' + 

@@ -172,7 +172,7 @@ INSERT INTO `shindig_app_views` (`appid`, `viewer_req`, `owner_req`, `page`, `vi
 (105, 'U', NULL, 'gadgetDetails', 'canvas', 700, 700, 0, 'gadgets-detail', NULL);
 
 --
-GRANT SELECT, INSERT, UPDATE ON `mysql`.`proc` TO 'vitrodb';
+GRANT SELECT ON `mysql`.`proc` TO 'vitrodb';
 
 
 
