@@ -1515,12 +1515,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <!-- VIVO OpenSocial Extension by UCSF -->
   <servlet>
-    <servlet-name>GadgetDetailsController</servlet-name>
-    <servlet-class>edu.ucsf.vitro.opensocial.GadgetDetailsController</servlet-class>
+    <servlet-name>GadgetController</servlet-name>
+    <servlet-class>edu.ucsf.vitro.opensocial.GadgetController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>GadgetDetailsController</servlet-name>
+    <servlet-name>GadgetController</servlet-name>
     <url-pattern>/gadget</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GadgetController</servlet-name>
+    <url-pattern>/gadget/sandbox</url-pattern>
   </servlet-mapping>
 
 

@@ -1,6 +1,6 @@
 package edu.ucsf.vitro.opensocial;
 
-public class PreparedGadget {
+public class PreparedGadget implements Comparable<PreparedGadget> {
 	private GadgetSpec gadgetSpec;
 	private OpenSocialManager helper;
 	private int moduleId;
@@ -14,7 +14,7 @@ public class PreparedGadget {
 		this.securityToken = securityToken;
 	}
 
-	public int CompareTo(PreparedGadget other) {
+	public int compareTo(PreparedGadget other) {
 		GadgetViewRequirements gvr1 = this.getGadgetViewRequirements();
 		GadgetViewRequirements gvr2 = other.getGadgetViewRequirements();
 		return ("" + this.getView() + (gvr1 != null ? gvr1.getDisplayOrder()
@@ -114,4 +114,7 @@ public class PreparedGadget {
 				+ helper.getOwnerId();
 	}
 
+	public String toString() {
+		return "" + this.moduleId + ", (" + this.gadgetSpec.toString() + ")";
+	}
 }

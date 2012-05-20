@@ -178,5 +178,9 @@ public class GadgetSpec {
 		GadgetViewRequirements req = getGadgetViewRequirements("/display");
 		return req != null ? req.getViewerReq() : ' ';
 	}
+	
+	public String toString() {
+		return "" + this.appId + ":" + this.name + ":" + this.openSocialGadgetURL;
+	}
 
 }

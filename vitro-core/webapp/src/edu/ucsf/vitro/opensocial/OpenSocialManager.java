@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.json.JSONException;
@@ -28,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController;
 
 public class OpenSocialManager {
+	public static final String SHINDIG_URL_PROP = "OpenSocial.shindigURL";
+	
 	public static final String OPENSOCIAL_DEBUG = "OPENSOCIAL_DEBUG";
 	public static final String OPENSOCIAL_NOCACHE = "OPENSOCIAL_NOCACHE";
 	public static final String OPENSOCIAL_GADGETS = "OPENSOCIAL_GADGETS";
@@ -38,7 +37,6 @@ public class OpenSocialManager {
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
 
-	private Random myRandom = new Random();
 	private List<PreparedGadget> gadgets = new ArrayList<PreparedGadget>();
 	private Map<String, String> pubsubdata = new HashMap<String, String>();
 	private int viewerId = -1;
@@ -55,18 +53,16 @@ public class OpenSocialManager {
 	}
 	
 	public OpenSocialManager(VitroRequest vreq, String pageName, boolean editMode) throws SQLException, IOException {
-		this.isDebug = true;/*vreq.getSession() != null
-				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
-						OPENSOCIAL_DEBUG));*/
+		this.isDebug = vreq.getSession() != null
+				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(OPENSOCIAL_DEBUG));
 		this.noCache = vreq.getSession() != null
-				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(
-						OPENSOCIAL_NOCACHE));
+				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(OPENSOCIAL_NOCACHE));
 		this.pageName = pageName;
 
 		configuration = ConfigurationProperties.getBean(vreq.getSession()
 				.getServletContext());
 
-		if (configuration.getProperty("OpenSocial.url") == null) {
+		if (configuration.getProperty(SHINDIG_URL_PROP) == null) {
 			// do nothing
 			return;
 		}
@@ -90,9 +86,7 @@ public class OpenSocialManager {
 					.substring(defaultNamespace.length() + 1)) : -1;
 		}
 		
-		Random random = new Random();
-
-		boolean gadgetLogin = pageName.contains("gadgetlogin");
+		boolean gadgetSandbox = "gadgetSandbox".equals(pageName);
 		String requestAppId = vreq.getParameter("appId");
 
 		Map<String, GadgetSpec> dbApps = new HashMap<String, GadgetSpec>();
@@ -149,15 +143,14 @@ public class OpenSocialManager {
 		}
 
 		// Add manual gadgets if there are any
-		// Note that this block of code only gets executed after someone logs in
-		// with gadgetlogin.aspx!
+		// Note that this block of code only gets executed after someone fills in the 
+		// gadget/sandbox block!
 		int moduleId = 0;
 		if (vreq.getSession() != null
 				&& vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
 			String openSocialGadgetURLS = (String) vreq.getSession()
 					.getAttribute(OPENSOCIAL_GADGETS);
-			String[] urls = openSocialGadgetURLS.split(System
-					.getProperty("line.separator"));
+			String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
 			for (String openSocialGadgetURL : urls) {
 				if (openSocialGadgetURL.length() == 0)
 					continue;
@@ -196,7 +189,7 @@ public class OpenSocialManager {
 		// if no manual one were added, use the ones from the DB
 		if (gadgets.size() == 0) {
 			// Load DB gadgets
-			if (gadgetLogin) {
+			if (gadgetSandbox) {
 				officialApps = dbApps;
 			}
 			for (GadgetSpec spec : officialApps.values()) {
@@ -204,7 +197,7 @@ public class OpenSocialManager {
 						spec.getName(), spec.getGadgetURL(),
 						spec.getChannels(), false, dataSource);
 				// only add ones that are visible in this context!
-				if (gadgetLogin
+				if (gadgetSandbox
 						|| gadget.show(viewerId, ownerId, pageName, dataSource)) {
 					String securityToken = socketSendReceive(viewerId, ownerId,
 							"" + gadget.getAppId());
@@ -213,21 +206,9 @@ public class OpenSocialManager {
 				}
 			}
 		}
-		// sort the gadgets
-		// TODO
-		// gadgets.Sort();
 
-		if (gadgets.size() != 0) {
-			// trigger the javascript to render gadgets
-			// TODO
-			/****
-			 * HtmlGenericControl body =
-			 * (HtmlGenericControl)page.Master.FindControl("bodyMaster"); if
-			 * (body == null) { body =
-			 * (HtmlGenericControl)page.Master.Master.FindControl("bodyMaster");
-			 * } body.Attributes.Add("onload", "my.init();");
-			 ***/
-		}
+		// sort the gadgets
+		Collections.sort(gadgets);
 	}
 
 	private String getGadgetFileNameFromURL(String url) {
@@ -305,7 +286,7 @@ public class OpenSocialManager {
 		if (pubsubdata.containsKey(key)) {
 			pubsubdata.remove(key);
 		}
-		if (value != null || !value.isEmpty()) {
+		if (value != null && !value.isEmpty()) {
 			pubsubdata.put(key, value);
 		}
 	}
@@ -314,7 +295,7 @@ public class OpenSocialManager {
 		return pubsubdata;
 	}
 
-	public void gemovePubsubGadgetsWithoutData() {
+	public void removePubsubGadgetsWithoutData() {
 		// if any visible gadgets depend on pubsub data that isn't present,
 		// throw them out
 		List<PreparedGadget> removedGadgets = new ArrayList<PreparedGadget>();
@@ -364,7 +345,7 @@ public class OpenSocialManager {
 		// generate the "profile was viewed" in Javascript (bot proof)
 		// regardless of any gadgets being visible, and we need this to be True
 		// for the shindig javascript libraries to load
-		return (configuration.getProperty("OpenSocial.url") != null
+		return (configuration.getProperty(SHINDIG_URL_PROP) != null
 				&& (getVisibleGadgets().size() > 0) || getPageName().equals(
 				"/display"));
 	}
@@ -438,7 +419,7 @@ public class OpenSocialManager {
 	}
 	
 	public String getContainerJavascriptSrc() {
-		return configuration.getProperty("OpenSocial.url")
+		return configuration.getProperty(SHINDIG_URL_PROP)
 				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:shindig-container.js?c=1"
 				+ (isDebug ? "&debug=1" : "");
 	}
@@ -464,7 +445,7 @@ public class OpenSocialManager {
 					+ getPubsubData().get(key) + "';" + lineSeparator;
 		}
 		gadgetScriptText += "my.openSocialURL = '"
-				+ configuration.getProperty("OpenSocial.url") + "';"
+				+ configuration.getProperty(SHINDIG_URL_PROP) + "';"
 				+ lineSeparator + "my.debug = " + (isDebug() ? "1" : "0") + ";"
 				+ lineSeparator + "my.noCache = " + (noCache() ? "1" : "0")
 				+ ";" + lineSeparator + "my.gadgets = [";
