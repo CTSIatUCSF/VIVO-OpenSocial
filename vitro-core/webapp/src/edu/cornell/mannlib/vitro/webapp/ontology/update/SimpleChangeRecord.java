@@ -59,14 +59,14 @@ public class SimpleChangeRecord implements ChangeRecord {
 			FileWriter test = new FileWriter(additionsFile);
 		} catch (IOException ioe) {
 				throw new RuntimeException(this.getClass().getName() + 
-					" unable to create required file at " + additionsFile);
+					" unable to create required file at " + additionsFile + ":" + ioe.getMessage(), ioe);
 		}	
 		this.retractionsFile = new File(retractionsFile);
 		try { 
 			FileWriter test = new FileWriter(retractionsFile);
 		} catch (IOException ioe) {
 			throw new RuntimeException(this.getClass().getName() + 
-					" unable to create required file at " + retractionsFile);			
+					" unable to create required file at " + retractionsFile + ":" + ioe.getMessage(), ioe);			
 		}
 	}
 	
