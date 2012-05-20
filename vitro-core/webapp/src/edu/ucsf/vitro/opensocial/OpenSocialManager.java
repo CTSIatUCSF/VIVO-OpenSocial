@@ -144,7 +144,7 @@ public class OpenSocialManager {
 
 		// Add manual gadgets if there are any
 		// Note that this block of code only gets executed after someone fills in the 
-		// gadget/sandbox block!
+		// gadget/sandbox form!
 		int moduleId = 0;
 		if (vreq.getSession() != null
 				&& vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
@@ -159,12 +159,12 @@ public class OpenSocialManager {
 				String gadgetFileName = getGadgetFileNameFromURL(openSocialGadgetURL);
 				String name = gadgetFileName;
 				List<String> channels = new ArrayList<String>();
-				boolean sandboxOnly = true;
+				boolean unknownGadget = true;
 				if (dbApps.containsKey(gadgetFileName)) {
 					appId = dbApps.get(gadgetFileName).getAppId();
 					name = dbApps.get(gadgetFileName).getName();
 					channels = dbApps.get(gadgetFileName).getChannels();
-					sandboxOnly = false;
+					unknownGadget = false;
 				} else {
 					appId = openSocialGadgetURL.hashCode();
 				}
@@ -174,9 +174,9 @@ public class OpenSocialManager {
 					continue;
 				}
 				GadgetSpec gadget = new GadgetSpec(appId, name,
-						openSocialGadgetURL, channels, sandboxOnly, dataSource);
+						openSocialGadgetURL, channels, unknownGadget, dataSource);
 				// only add ones that are visible in this context!
-				if (sandboxOnly
+				if (unknownGadget
 						|| gadget.show(viewerId, ownerId, pageName, dataSource)) {
 					String securityToken = socketSendReceive(viewerId, ownerId,
 							"" + gadget.getAppId());

@@ -17,7 +17,7 @@ public class GadgetSpec {
 	private String name;
 	private int appId = 0;
 	private List<String> channels = new ArrayList<String>();
-	private boolean fromSandbox = false;
+	private boolean unknownGadget = false;
 	private Map<String, GadgetViewRequirements> viewRequirements = new HashMap<String, GadgetViewRequirements>();
 
 	// For preloading
@@ -36,12 +36,12 @@ public class GadgetSpec {
 	}
 
 	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			List<String> channels, boolean fromSandbox, BasicDataSource ds)
+			List<String> channels, boolean unknownGadget, BasicDataSource ds)
 			throws SQLException {
 		this(appId, name, openSocialGadgetURL, channels);
-		this.fromSandbox = fromSandbox;
+		this.unknownGadget = unknownGadget;
 		// Load gadgets from the DB first
-		if (!fromSandbox) {
+		if (!unknownGadget) {
 			Connection conn = null;
 			Statement stmt = null;
 			ResultSet rset = null;
@@ -94,10 +94,10 @@ public class GadgetSpec {
 		return channels;
 	}
 
-	public boolean listensTo(String channel) { // if fromSandbox just say yes,
+	public boolean listensTo(String channel) { // if an unknownd gadget just say yes,
 												// we don't care about
 												// performance in this situation
-		return fromSandbox || channels.contains(channel);
+		return unknownGadget || channels.contains(channel);
 	}
 
 	public GadgetViewRequirements getGadgetViewRequirements(String page) {
@@ -170,7 +170,7 @@ public class GadgetSpec {
 	}
 
 	public boolean fromSandbox() {
-		return fromSandbox;
+		return unknownGadget;
 	}
 
 	// who sees it? Return the viewerReq for the ProfileDetails page
