@@ -302,7 +302,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "search");
 		        // put list of people found onto pubsub channel
-		        List<Integer> ids = OpenSocialManager.getOpenSocialId(individuals);
+		        List<String> ids = OpenSocialManager.getOpenSocialId(individuals);
 		        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
 		        		OpenSocialManager.buildJSONPersonIds(ids, "" + ids.size() + " people found"));
 		        body.put("openSocial", openSocialManager);

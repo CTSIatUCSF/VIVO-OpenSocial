@@ -107,7 +107,7 @@ public class GadgetSpec {
 		return null;
 	}
 
-	public boolean show(int viewerId, int ownerId, String page,
+	public boolean show(String viewerId, String ownerId, String page,
 			BasicDataSource ds) throws SQLException {
 		boolean show = true;
 		// if there are no view requirements, go ahead and show it. We are
@@ -120,7 +120,7 @@ public class GadgetSpec {
 		if (viewRequirements.containsKey(page)) {
 			show = true;
 			GadgetViewRequirements req = getGadgetViewRequirements(page);
-			if ('U' == req.getViewerReq() && viewerId <= 0) {
+			if ('U' == req.getViewerReq() && viewerId != null) {
 				show = false;
 			} else if ('R' == req.getViewerReq()) {
 				show &= isRegisteredTo(viewerId, ds);
@@ -134,7 +134,7 @@ public class GadgetSpec {
 		return show;
 	}
 
-	public boolean isRegisteredTo(int personId, BasicDataSource ds)
+	public boolean isRegisteredTo(String personId, BasicDataSource ds)
 			throws SQLException {
 		int count = 0;
 
@@ -144,7 +144,7 @@ public class GadgetSpec {
 
 		try {
 			String sqlCommand = "select count(*) from shindig_app_registry where appId = "
-					+ getAppId() + " and personId = " + personId + ";";
+					+ getAppId() + " and personId = '" + personId + "';";
 			conn = ds.getConnection();
 			stmt = conn.createStatement();
 			rset = stmt.executeQuery(sqlCommand);

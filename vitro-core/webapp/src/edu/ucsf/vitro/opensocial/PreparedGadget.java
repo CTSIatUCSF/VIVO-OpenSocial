@@ -1,5 +1,8 @@
 package edu.ucsf.vitro.opensocial;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class PreparedGadget implements Comparable<PreparedGadget> {
 	private GadgetSpec gadgetSpec;
 	private OpenSocialManager helper;
@@ -109,9 +112,9 @@ public class PreparedGadget implements Comparable<PreparedGadget> {
 		}
 	}
 
-	public String getCanvasURL() {
+	public String getCanvasURL() throws UnsupportedEncodingException {
 		return "~/gadget?appId=" + getAppId() + "&Person="
-				+ helper.getOwnerId();
+				+ URLEncoder.encode(helper.getOwnerId(), "UTF-8");
 	}
 
 	public String toString() {

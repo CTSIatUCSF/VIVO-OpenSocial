@@ -2,6 +2,7 @@ package edu.ucsf.vitro.opensocial;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +40,8 @@ public class OpenSocialManager {
 
 	private List<PreparedGadget> gadgets = new ArrayList<PreparedGadget>();
 	private Map<String, String> pubsubdata = new HashMap<String, String>();
-	private int viewerId = -1;
-	private int ownerId = -1;
+	private String viewerId = null;
+	private String ownerId = null;
 	private boolean isDebug = false;
 	private boolean noCache = false;
 	private String pageName;
@@ -66,14 +67,9 @@ public class OpenSocialManager {
 			// do nothing
 			return;
 		}
-		String defaultNamespace = configuration
-				.getProperty("Vitro.defaultNamespace");
+
 		Individual owner = IndividualController.getIndividualFromRequest(vreq);
-		try {
-			this.ownerId = getOpenSocialId(owner);
-		} catch (NumberFormatException e) {
-			this.ownerId = -1;
-		}
+		this.ownerId = owner != null ? owner.getURI() : null;
 
 		// in editMode we need to set the viewer to be the same as the owner
 		// otherwise, the gadget will not be able to save appData correctly
@@ -82,8 +78,7 @@ public class OpenSocialManager {
 		}
 		else {
 			UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
-			this.viewerId = viewer != null ? Integer.parseInt(viewer.getUri()
-					.substring(defaultNamespace.length() + 1)) : -1;
+			this.viewerId = viewer != null ? viewer.getUri() : null;
 		}
 		
 		boolean gadgetSandbox = "gadgetSandbox".equals(pageName);
@@ -224,7 +219,7 @@ public class OpenSocialManager {
 		return noCache;
 	}
 
-	public int getOwnerId() {
+	public String getOwnerId() {
 		return ownerId;
 	}
 
@@ -237,21 +232,16 @@ public class OpenSocialManager {
 		return false;
 	}
 
-	// uri to our INT based OpenSocial ID helper functions
-	public static int getOpenSocialId(Individual ind) {
-		return ind != null ? Integer.parseInt(ind.getLocalName().substring(1)) : -1;		
-	}
-	
-	public static List<Integer> getOpenSocialId(List<Individual> individuals) {
-		List<Integer> personIds = new ArrayList<Integer>();
+	public static List<String> getOpenSocialId(List<Individual> individuals) {
+		List<String> personIds = new ArrayList<String>();
 		for (Individual ind : individuals) {
-			personIds.add(getOpenSocialId(ind));
+			personIds.add(ind.getURI());
 		}
 		return personIds;
 	}
 
 	// JSON Helper Functions
-	public static String buildJSONPersonIds(List<Integer> personIds,
+	public static String buildJSONPersonIds(List<String> personIds,
 			String message) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("message", message);
@@ -259,15 +249,15 @@ public class OpenSocialManager {
 		return json.toString();
 	}
 	
-	public static String buildJSONPersonIds(int personId, String message) throws JSONException {
-		List<Integer> personIds = new ArrayList<Integer>();
+	public static String buildJSONPersonIds(String personId, String message) throws JSONException {
+		List<String> personIds = new ArrayList<String>();
 		personIds.add(personId);
 		return buildJSONPersonIds(personIds, message);
 	}
 
 	public static String buildJSONPersonIds(Individual ind, String message) throws JSONException {
-		List<Integer> personIds = new ArrayList<Integer>();
-		personIds.add(getOpenSocialId(ind));
+		List<String> personIds = new ArrayList<String>();
+		personIds.add(ind.getURI());
 		return buildJSONPersonIds(personIds, message);
 	}
 	/****
@@ -366,8 +356,8 @@ public class OpenSocialManager {
 			String xtraId1Type, String xtraId1Value) throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
-		String sqlCommand = "INSERT INTO shindig_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ("
-				+ userId +  ",'<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
+		String sqlCommand = "INSERT INTO shindig_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
+				+ userId +  "','<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
 				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
 				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
 				+ xtraId1Type + "','" + xtraId1Value + "');";		
@@ -388,15 +378,15 @@ public class OpenSocialManager {
 			
 	}
 
-	private String socketSendReceive(int viewer, int owner, String gadget)
+	private String socketSendReceive(String viewer, String owner, String gadget)
 			throws IOException {
 		// These keys need to match what you see in
-		// edu.ucsf.profiles.shindig.service.SecureTokenGeneratorService in
+		// edu.ucsf.orng.shindig.service.SecureTokenGeneratorService in
 		// Shindig
 		String[] tokenService = configuration.getProperty(
 				"OpenSocial.tokenService").split(":");
-		String request = "c=default&v=" + viewer + "&o=" + owner + "&g="
-				+ gadget + "\r\n";
+		String request = "c=default" + (viewer != null ? "&v=" + URLEncoder.encode(viewer, "UTF-8") : "") + 
+				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + gadget + "\r\n";
 
 		// Create a socket connection with the specified server and port.
 		Socket s = new Socket(tokenService[0],
