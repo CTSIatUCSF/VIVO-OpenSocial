@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		${stylesheets.add('<link rel="stylesheet" href="${urls.base}/themes/opensocial/css/openSocial/gadgets.css" />')}			
 		${headScripts.add('<script type="text/javascript" src="${openSocial.containerJavascriptSrc}"></script>',
 						  '<script type="text/javascript" language="javascript">${openSocial.gadgetJavascript}</script>',
-						  '<script type="text/javascript" src="${urls.base}/themes/opensocial/js/openSocial/shindig.js"></script>')}
+						  '<script type="text/javascript" src="${urls.base}/themes/opensocial/js/openSocial/orng.js"></script>')}
     </#if>	
 </#if>	
 
