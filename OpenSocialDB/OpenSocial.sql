@@ -167,8 +167,6 @@ INSERT INTO `orng_app_views` (`appid`, `viewer_req`, `owner_req`, `page`, `view`
 (104, 'U', NULL, 'SimilarPeople.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL),
 (104, 'U', NULL, 'individual', 'small', 160, 160, 0, 'gadgets-view', NULL),
 (104, 'U', NULL, 'CoAuthors.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL),
-(105, 'U', NULL, 'individual', 'small', 160, 160, 0, 'gadgets-view', NULL),
-(105, 'U', NULL, 'gadgetDetails', 'canvas', 700, 700, 0, 'gadgets-detail', NULL);
 
 --
 GRANT SELECT ON `mysql`.`proc` TO 'vitrodb';
