@@ -62,9 +62,11 @@ gadgets.pubsubrouter.init(function(id) {
       }
       else if (channel == 'added' && my.gadgets[moduleId].view == 'home') {
           if (message == 'Y') {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'SHOW', 'profile_edit_view']);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'SHOW', 'profile_edit_view']);
+            // find out whose page we are on, if any
+        	var userId = gadgets.util.getUrlParameters()['uri'] || document.URL.replace('/display/', '/individual/');
             osapi.activities.create(
-		    { 	'userId': gadgets.util.getUrlParameters()['Person'],
+		    { 	'userId': userId,
 			    'appId': my.gadgets[moduleId].appId,
 			    'activity': {'postedTime': new Date().getTime(), 'title': 'added a gadget', 'body': 'added the ' + my.gadgets[moduleId].name + ' gadget to their profile' }
 		    }).execute(function(response){});
@@ -345,7 +347,7 @@ OrngGadget.prototype.getAdditionalParams = function() {
 OrngGadget.prototype.finishRender = function(chrome) {
   window.frames[this.getIframeId()].location = this.getIframeUrl();
   if (my.gadgets[this.id].start_closed) {
-    this.handleToggle();
+    this.handleToggle(false);
   }
   else if (chrome) {
 	// set the gadget box width, and remember that we always render as open
@@ -358,7 +360,8 @@ OrngGadget.prototype.getIframeUrl = function() {
     return url.replace('REPLACE_THIS_VIEW', my.gadgets[this.id].view);
 };
 
-OrngGadget.prototype.handleToggle = function() {
+OrngGadget.prototype.handleToggle = function(track) {
+  if (typeof(track) === 'undefined') track = true;
   var gadgetIframe = document.getElementById(this.getIframeId());
   if (gadgetIframe) {
     var gadgetContent = gadgetIframe.parentNode;
@@ -376,17 +379,23 @@ OrngGadget.prototype.handleToggle = function() {
  	  }
  	  
  	  if (my.gadgets[this.id].view == 'home') {
-      	// record in google analytics     
-        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN_IN_EDIT', 'profile_edit_view']);  
+ 		  if (track) {
+	      	// record in google analytics     
+	        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN_IN_EDIT', 'profile_edit_view']);
+ 		  }
       }
       else {
+    	// find out whose home page we are on if any
+    	var userId = gadgets.util.getUrlParameters()['uri'] || document.URL.replace('/display/', '/individual/');
         osapi.activities.create(
-		  { 	'userId': gadgets.util.getUrlParameters()['Person'],
+		  { 	'userId': userId,
 			    'appId': my.gadgets[this.id].appId,
 			    'activity': {'postedTime': new Date().getTime(), 'title': 'gadget viewed', 'body': my.gadgets[this.id].name + ' gadget was viewed' }
 		  }).execute(function(response){});
-      	// record in google analytics     
-        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN']);  
+        if (track) {
+        	// record in google analytics     
+        	_gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN']);
+        }
 	  }
     }
     else {
@@ -395,12 +404,16 @@ OrngGadget.prototype.handleToggle = function() {
       gadgetContent.style.display = 'none'; 
       gadgetImg.src = '/' + location.pathname.split('/')[1] + '/themes/opensocial/images/openSocial/icon_squareArrow.gif';
  	  if (my.gadgets[this.id].view == 'home') {
-      	// record in google analytics     
-        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE_IN_EDIT', 'profile_edit_view']);  
+ 		  if (track) {
+	      	// record in google analytics     
+	        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE_IN_EDIT', 'profile_edit_view']);
+ 		  }
       }
       else {
-      	// record in google analytics     
-        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE']);  
+    	  if (track) {
+	      	// record in google analytics     
+	        _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE']);
+    	  }
       }
     }
   }
