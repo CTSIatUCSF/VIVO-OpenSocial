@@ -37,7 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,7 +73,7 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
     private final static Log log = LogFactory.getLog(VitroJenaSDBModelMaker.class);
     
     private StoreDesc storeDesc = null;
-    private BasicDataSource bds = null;
+    private DataSource ds = null;
     private SDBConnection conn = null;
     private SDBGraphConnectionGenerator connGen = null;
     
@@ -84,12 +85,12 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
     
     private Resource sdbResource; // a resource representing the SDB database 
     
-    public VitroJenaSDBModelMaker(StoreDesc storeDesc, BasicDataSource bds) 
+    public VitroJenaSDBModelMaker(StoreDesc storeDesc, DataSource ds) 
             throws SQLException {
         
         this.storeDesc = storeDesc;
-        this.bds = bds;
-        connGen = new SDBGraphConnectionGenerator(bds); 
+        this.ds = ds;
+        connGen = new SDBGraphConnectionGenerator(ds); 
         
         Store store = getStore();
         try {

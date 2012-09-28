@@ -50,7 +50,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * TODO
@@ -160,8 +160,8 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 	private ProxyItemInfo wrapProxyItem(ProxyItemInfo item) {
 		String imagePath = item.getImageUrl();
 		if (imagePath.isEmpty()) {
-			imagePath = ImageUtil
-					.getPlaceholderImagePathForType(VitroVocabulary.USERACCOUNT);
+			imagePath = PlaceholderUtil.getPlaceholderImagePathForType(vreq,
+					VitroVocabulary.USERACCOUNT);
 		}
 
 		UserAccount ua = userAccountsDao.getUserAccountByUri(item.getUri());
@@ -177,8 +177,8 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 	private ProxyItemInfo wrapProfileItem(ProxyItemInfo item) {
 		String imagePath = item.getImageUrl();
 		if (imagePath.isEmpty()) {
-			imagePath = ImageUtil.getPlaceholderImagePathForIndividual(vreq,
-					item.getUri());
+			imagePath = PlaceholderUtil.getPlaceholderImagePathForIndividual(
+					vreq, item.getUri());
 		}
 
 		return new ProfileItemWrapper(item.getUri(), item.getLabel(),

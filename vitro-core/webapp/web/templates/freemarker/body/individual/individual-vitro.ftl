@@ -25,6 +25,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<#if !labelCount??>
+    <#assign labelCount = 0 >
+</#if>
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
@@ -35,8 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   propertyGroups=propertyGroups 
                   namespaces=namespaces 
                   editable=editable 
-                  showPlaceholder="with_add_link" 
-                  placeholder="${urls.images}/placeholders/thumbnail.jpg" />
+                  showPlaceholder="with_add_link" />
     </#assign>
     
     <#if ( individualImage?contains('<img class="individual-photo"') )>
@@ -55,8 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
-                    <@p.label individual editable />
-                        
+                    <@p.label individual editable labelCount />
+
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual /><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/>
                 </h1>

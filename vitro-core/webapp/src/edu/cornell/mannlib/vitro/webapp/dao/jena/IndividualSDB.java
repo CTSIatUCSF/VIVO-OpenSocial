@@ -79,14 +79,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
     private static final Log log = LogFactory.getLog(
                 IndividualSDB.class.getName());
     private OntResource ind = null;
-    private WebappDaoFactoryJena webappDaoFactory = null;
+    private WebappDaoFactorySDB webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
     private DatasetWrapperFactory dwf = null;
@@ -99,7 +101,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
                          DatasetWrapperFactory datasetWrapperFactory,
                          SDBDatasetMode datasetMode,
-                         WebappDaoFactoryJena wadf,
+                         WebappDaoFactorySDB wadf,
                          Model initModel) {
     	this.individualURI = individualURI;
     	this.dwf = datasetWrapperFactory;
@@ -134,8 +136,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory, 
             SDBDatasetMode datasetMode,
-            WebappDaoFactoryJena wadf,
-            boolean skipInitialization) {
+            WebappDaoFactorySDB wadf, 
+            boolean skipInitialization) throws IndividualNotFoundException {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
@@ -161,6 +163,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         		        QueryFactory.create(getStatements), dataset)
         		                .execConstruct();
         	} finally {
+        	    if (dataset == null) {
+        	        throw new RuntimeException("dataset is null");
+        	    } else if (dataset.getLock() == null) {
+        	        throw new RuntimeException("dataset lock is null");
+        	    }
+        	    
         		dataset.getLock().leaveCriticalSection();
         		w.close();
         	}
@@ -202,7 +210,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
-            WebappDaoFactoryJena wadf) {
+            WebappDaoFactorySDB wadf) throws IndividualNotFoundException {
         this(individualURI, 
              datasetWrapperFactory, 
              datasetMode, 
@@ -210,7 +218,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
              !SKIP_INITIALIZATION);
     }
     
-    public class IndividualNotFoundException extends RuntimeException {}
+    public class IndividualNotFoundException extends Exception {}
     
     private void setUpURIParts(OntResource ind) {
         if (ind != null) {
@@ -309,48 +317,22 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    private synchronized void constructProperty(OntResource ind, String propertyURI) {
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            String[] graphVars = { "?g" };
-            String queryStr = 
-                "CONSTRUCT { <"+ind.getURI()+"> <" + propertyURI + "> ?value } \n" +
-                    "WHERE {  \n" +
-                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value \n" + 
-                    WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                    "\n} ";
-            Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(
-                    query, dataset);
-            qe.execConstruct(ind.getModel());
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
-        }
-    }
-
     public Float getSearchBoost(){ 
         if( this._searchBoostJena != null ){
             return this._searchBoostJena;
         }else{
-            String[] graphVars = { "?g" };
             String getPropertyValue = 
             	"SELECT ?value \n" +
-            	"WHERE { GRAPH ?g { \n" +
-            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value }\n" + 
-            	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) + "\n" +
+            	"WHERE { \n" +
+            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value \n" + 
             	"}";
-            
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
+        	QueryExecution qe = QueryExecutionFactory.create(
+                    QueryFactory.create(getPropertyValue), dataset);
             try{
-                ResultSet rs = QueryExecutionFactory.create(
-                		QueryFactory.create(getPropertyValue),
-                		dataset).execSelect();
-                
+                ResultSet rs = qe.execSelect();       
                 if(rs.hasNext()){
                 	QuerySolution qs = rs.nextSolution();
                 	if(qs.get("value") !=null){
@@ -358,14 +340,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 		searchBoost = Float.parseFloat(value.getLexicalForm());
                 		return searchBoost;
                 	}
-                }
-                else{
-                	    return null;
+                } else{
+                   return null;
                 }
             } catch (Exception e){
             	log.error(e,e); 
                 return null;            	
-            }finally{
+            } finally{
+                qe.close();
             	dataset.getLock().leaveCriticalSection();
             	w.close();
             }
@@ -490,8 +472,24 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
     			    continue;	
     			}
-    			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
-    			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
+    			Individual subj = null;
+    			try {
+    			    subj = new IndividualSDB(
+    			            ((OntResource) s.getSubject().as(OntResource.class))
+    			                    .getURI(), 
+    			                            this.dwf, datasetMode, webappDaoFactory);
+    			} catch (IndividualNotFoundException e) {
+    			    // leave null subject
+    			}
+    			Individual obj = null;
+    			try {
+    			    obj = new IndividualSDB(
+    			            ((OntResource) s.getObject().as(OntResource.class))
+    			                    .getURI(), 
+    			                            this.dwf, datasetMode, webappDaoFactory);
+    			} catch (IndividualNotFoundException e) {
+    			    // leave null object
+    			}
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
     			// We don't want to filter out statements simply because we 
     			// can't find a type for the property, so we'll just make a 
@@ -543,15 +541,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    while (values.hasNext()) {
     	    	result = values.next();
     	    	RDFNode value = result.get("object");
-    	    	if (value.canAs(OntResource.class)) {
-        	    	relatedIndividuals.add(
-        	    		new IndividualSDB(
-        	    		        ((OntResource) value.as(OntResource.class))
-        	    		                .getURI(), 
-        	    		                this.dwf, 
-        	    		                datasetMode, 
-        	    		                webappDaoFactory) );  
-        	    } 
+    	    	try {
+        	    	if (value.canAs(OntResource.class)) {
+            	    	relatedIndividuals.add(
+            	    		new IndividualSDB(
+            	    		        ((OntResource) value.as(OntResource.class))
+            	    		                .getURI(), 
+            	    		                this.dwf, 
+            	    		                datasetMode, 
+            	    		                webappDaoFactory) );  
+            	    } 
+    	    	} catch (IndividualNotFoundException e) {
+    	    	    // don't add to the list
+    	    	}
     	    }
     	} finally {
     		dataset.getLock().leaveCriticalSection();
@@ -581,9 +583,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             		QuerySolution result = results.next();
             		RDFNode value = result.get("object");
             	    if (value != null && value.canAs(OntResource.class)) {
-            	    	return new IndividualSDB(
-            	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
-            	    	                dwf, datasetMode, webappDaoFactory);  
+            	        try {
+                	    	return new IndividualSDB(
+                	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
+                	    	                dwf, datasetMode, webappDaoFactory);
+            	        } catch (IndividualNotFoundException e) {
+            	            return null;
+            	        }
             	    } 
         	    }
         		return null;
@@ -755,16 +761,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
    		        				? WebappDaoFactorySDB.SDBDatasetMode
    		        						.ASSERTIONS_ONLY 
    		        			    : datasetMode)) 
-        		+ "} \n";        	
-        	DatasetWrapper w = getDatasetWrapper();
-        	Dataset dataset = w.getDataset();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
+        		+ "} \n";
+    		RDFService service = webappDaoFactory.getRDFService();	
         	try {
-        	    tempModel = QueryExecutionFactory.create(
-        	            QueryFactory.create(getTypes), dataset).execConstruct();
-        	} finally {
-        	    dataset.getLock().leaveCriticalSection();
-        	    w.close();
+        	    tempModel = RDFServiceUtils.parseModel(
+        	            service.sparqlConstructQuery(
+        	                    getTypes, RDFService.ModelSerializationFormat.N3),
+        	                            RDFService.ModelSerializationFormat.N3);
+        	} catch (RDFServiceException e) {
+        	    throw new RuntimeException(e);
         	}
 		}
     	StmtIterator stmtItr = tempModel.listStatements(
@@ -872,22 +877,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		return false;
 	}
 	
-	@Override
-	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {  
-
-		List<VClass> types =  getVClasses(false);
-		Iterator<VClass> itr = types.iterator();
-
-		while(itr.hasNext()) {
-			String typeURI = itr.next().getURI();
-			if (pfs.isClassProhibitedFromSearch(typeURI)) {
-				return true;
-			}
-		}
-
-		return false;
-
-	}
     /**
      * Overriding the base method so that we can do the sorting by arbitrary property here.  An
      * IndividualSDB has a reference back to the model; everything else is just a dumb bean (for now).

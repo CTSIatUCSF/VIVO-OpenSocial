@@ -49,7 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.PublicationHasAuthorValid
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.DateTimeIntervalValidationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 
 /**
@@ -83,6 +83,7 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
 
         editConfiguration.addNewResource("authorshipUri", DEFAULT_NS_TOKEN);
         editConfiguration.addNewResource("newPerson", DEFAULT_NS_TOKEN);
+        editConfiguration.addNewResource("newOrg", DEFAULT_NS_TOKEN);
         
         //In scope
         setUrisAndLiteralsInScope(editConfiguration, vreq);
@@ -144,7 +145,9 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
                 getN3NewPersonLastName(),                
                 getN3NewPerson(),
                 getN3AuthorshipRank(),
-                getN3ForExistingPerson());
+                getN3ForExistingPerson(),
+                getN3NewOrg(),
+                getN3ForExistingOrg());
 		
 	}
 	
@@ -178,6 +181,19 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
 		"?personUri core:authorInAuthorship ?authorshipUri .";
 	}
 	
+	private String getN3NewOrg() {
+		return  getN3PrefixString() + 
+        "?newOrg a foaf:Organization ;\n" + 
+        "<" + RDFS.label.getURI() + "> ?orgName .\n" + 
+        "?authorshipUri core:linkedAuthor ?newOrg .\n" + 
+        "?newOrg core:authorInAuthorship ?authorshipUri . ";
+	}
+	
+	private String getN3ForExistingOrg() {
+		return getN3PrefixString() + 
+		"?authorshipUri core:linkedAuthor ?orgUri .\n" + 
+		"?orgUri core:authorInAuthorship ?authorshipUri .";
+	}
 	/**  Get new resources	 */
 	//A new authorship uri will always be created when an author is added
 	//A new person may be added if a person not in the system will be added as author
@@ -187,6 +203,7 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
 			HashMap<String, String> newResources = new HashMap<String, String>();			
 			newResources.put("authorshipUri", DEFAULT_NS_TOKEN);
 			newResources.put("newPerson", DEFAULT_NS_TOKEN);
+			newResources.put("newOrg", DEFAULT_NS_TOKEN);
 			return newResources;
 		}
 	
@@ -206,6 +223,7 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
     	List<String> urisOnForm = new ArrayList<String>();    	
     	//If an existing person is being used as an author, need to get the person uri
     	urisOnForm.add("personUri");
+    	urisOnForm.add("orgUri");
     	editConfiguration.setUrisOnform(urisOnForm);
     	
     	//for person who is not in system, need to add first name, last name and middle name
@@ -214,6 +232,7 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
     			"middleName",
     			"lastName",
     			"rank",
+    			"orgName",
     			"label");
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }   
@@ -242,6 +261,8 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
     	setLastNameField(editConfiguration);
     	setRankField(editConfiguration);
     	setPersonUriField(editConfiguration);
+    	setOrgUriField(editConfiguration);
+    	setOrgNameField(editConfiguration);
     }
 	
 	private void setLabelField(EditConfigurationVTwo editConfiguration) {
@@ -298,12 +319,27 @@ public class AddAuthorsToInformationResourceGenerator extends VivoBaseGenerator 
 
 	private void setPersonUriField(EditConfigurationVTwo editConfiguration) {
 		editConfiguration.addField(new FieldVTwo().
-				setName("personUri").
-				setObjectClassUri(personClass)
+				setName("personUri")
+				//.setObjectClassUri(personClass)
 				);
 		
 	}
 
+	private void setOrgUriField(EditConfigurationVTwo editConfiguration) {
+		editConfiguration.addField(new FieldVTwo().
+				setName("orgUri")
+				//.setObjectClassUri(personClass)
+				);
+		
+	}
+	private void setOrgNameField(EditConfigurationVTwo editConfiguration) {
+		editConfiguration.addField(new FieldVTwo().
+				setName("orgName").
+				setValidators(list("datatype:" + XSD.xstring.toString())).
+				setRangeDatatypeUri(XSD.xstring.toString())
+				);
+		
+	}
 	//Form specific data
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();

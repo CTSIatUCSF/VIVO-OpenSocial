@@ -34,8 +34,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -44,6 +44,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
@@ -57,7 +59,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
 	
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new DoFrontEndEditing());
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS;
 	}
 
     @Override 
@@ -87,10 +89,12 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         
         //The submission for getting the entity to return to is not retrieved from the session but needs
         //to be created - as it is in processRdfForm3.jsp
-        //TODO: this will not work if there entityToReturnTo has a new resource URI
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);
-        if( entityToReturnTo == null )
-            entityToReturnTo = N3EditUtils.processEntityToReturnTo(editConfig, submission, vreq);                        
+        if( entityToReturnTo == null ){
+            //this will not work if there entityToReturnTo has a new resource URI, 
+            //in that case entityToReturnTo should not have been passed to this method as null
+            MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);        
+            entityToReturnTo = N3EditUtils.processEntityToReturnTo(editConfig, submission, vreq);                  
+        }
       
         //Get url pattern
         String urlPattern = Utilities.getPostEditUrlPattern(vreq, editConfig);                
@@ -104,7 +108,8 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
             paramMap.put("extra","true"); //for ie6       
             //If url already contains an ? then need to add extra params
             String path = UrlBuilder.addParams(urlPattern, paramMap);
-            path += getPredicateAnchor( vreq, editConfig );
+            path += getSpecialModelParam( vreq, editConfig);
+            path += getPredicateAnchor( vreq, editConfig );            
             return new RedirectResponseValues( path );
             
         } else if ( !urlPattern.endsWith("individual") && !urlPattern.endsWith("entity") ){
@@ -120,8 +125,9 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
             ParamMap paramMap = new ParamMap();
             paramMap.put("uri", editConfig.getSubjectUri() );
             paramMap.put("extra","true"); //for ie6           
-            String path = UrlBuilder.getPath( UrlBuilder.Route.INDIVIDUAL, paramMap);            
-            path += getPredicateAnchor( vreq, editConfig );
+            String path = UrlBuilder.getPath( UrlBuilder.Route.INDIVIDUAL, paramMap);
+            path += getSpecialModelParam( vreq, editConfig);
+            path += getPredicateAnchor( vreq, editConfig );            
             return new RedirectResponseValues( path );
             
         }else{
@@ -130,6 +136,16 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         }
     }
     
+    private static String getSpecialModelParam(VitroRequest vreq,
+            EditConfigurationVTwo editConfig) {
+        if( editConfig.getAboxModelId() != null && 
+            editConfig.getAboxModelId().equals(VitroModelSource.ModelName.DISPLAY.toString())){
+            return "&"+ DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL + "=1";
+        }else{
+            return "";
+        }
+    }
+
     public static void doPostEditCleanup( VitroRequest vreq ) {
         EditConfigurationVTwo configuration = EditConfigurationVTwo.getConfigFromSession(vreq.getSession(), vreq);      
         if(configuration == null)

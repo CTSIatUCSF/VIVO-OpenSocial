@@ -3,28 +3,34 @@ package edu.ucsf.vitro.opensocial;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URLEncoder;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestAnalysisContextImpl;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestAnalyzer;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestInfo;
 
 public class OpenSocialManager {
 	public static final String SHINDIG_URL_PROP = "OpenSocial.shindigURL";
@@ -38,6 +44,8 @@ public class OpenSocialManager {
 	public static final String TAG_NAME = "openSocial";
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
+	
+    private static final Log log = LogFactory.getLog(OpenSocialManager.class);	
 
 	// for performance
 	private static Map<String, GadgetSpec> gadgetCache;
@@ -72,19 +80,25 @@ public class OpenSocialManager {
 			return;
 		}
 
-		Individual owner = IndividualController.getIndividualFromRequest(vreq);
-		this.ownerId = owner != null ? owner.getURI() : null;
+		// Analyze the request to figure out whose page we are viewing.
+		this.ownerId = figureOwnerId(vreq);
 
-		// in editMode we need to set the viewer to be the same as the owner
-		// otherwise, the gadget will not be able to save appData correctly
+		// If we are authorized to edit on behalf of the page owner,
+		// set the viewer ID to be the owner ID, so it looks like we are the page owner.
 		if (editMode) {
 			this.viewerId = ownerId;
 		}
 		else {
+			// If we have a profile page, use that URI. Otherwise, use the URI of the logged-in user account, if any.
 			UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
-			// attempt to use profile URI if present, otherwise user user oriented URI
-			this.viewerId = viewer != null && viewer.getProxiedIndividualUris().size() == 1 ? 
-					viewer.getProxiedIndividualUris().toArray()[0].toString() : (viewer != null ? viewer.getUri() : null);
+			Collection<String> profileUris = HasProfile.getProfileUris(RequestIdentifiers.getIdBundleForRequest(vreq));
+			if (!profileUris.isEmpty()) {
+				this.viewerId = profileUris.iterator().next();
+			} else if (viewer != null) {
+				this.viewerId = viewer.getUri();
+			} else {
+				this.viewerId = null;
+			}
 		}
 		
 		String requestAppId = vreq.getParameter("appId");
@@ -110,8 +124,13 @@ public class OpenSocialManager {
 			for (GadgetSpec gadgetSpec : allDBGadgets.values()) {
 				// only add ones that are visible in this context!
 				int moduleId = 0;
-				if (((requestAppId == null && gadgetSpec.isEnabled()) || gadgetSpec.getAppId() ==  Integer.parseInt(requestAppId)) && 
-						gadgetSpec.show(viewerId, ownerId, pageName, dataSource)) {
+				if (
+						(
+								(requestAppId == null && gadgetSpec.isEnabled()) || 
+								(requestAppId != null && gadgetSpec.getAppId() ==  Integer.parseInt(requestAppId))
+						) && 
+						gadgetSpec.show(viewerId, ownerId, pageName, dataSource)
+						) {
 					String securityToken = socketSendReceive(viewerId, ownerId, "" + gadgetSpec.getAppId());
 					gadgets.add(new PreparedGadget(gadgetSpec, this, moduleId++, securityToken));
 				}
@@ -126,6 +145,14 @@ public class OpenSocialManager {
 		gadgetCache = null;
 	}
 
+	private String figureOwnerId(VitroRequest vreq) {
+		IndividualRequestAnalyzer requestAnalyzer = new IndividualRequestAnalyzer(vreq,
+				new IndividualRequestAnalysisContextImpl(vreq));
+		IndividualRequestInfo requestInfo = requestAnalyzer.analyze();
+		Individual owner = requestInfo.getIndividual();
+		return owner != null ? owner.getURI() : null;
+	}
+	
 	private String getGadgetFileNameFromURL(String url) {
 		String[] urlbits = url.split("/");
 		return urlbits[urlbits.length - 1];
@@ -295,7 +322,7 @@ public class OpenSocialManager {
 		String[] tokenService = configuration.getProperty(
 				"OpenSocial.tokenService").split(":");
 		String request = "c=default" + (viewer != null ? "&v=" + URLEncoder.encode(viewer, "UTF-8") : "") + 
-				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + URLEncoder.encode(gadget, "UTF-8") + "\r\n";
+				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + gadget + "\r\n";
 
 		// Create a socket connection with the specified server and port.
 		Socket s = new Socket(tokenService[0],
@@ -326,15 +353,13 @@ public class OpenSocialManager {
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
 		String gadgetScriptText = "var my = {};" + lineSeparator
-				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
+				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, chrome_id, opt_params, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
 				+ lineSeparator + "this.secureToken = secureToken;"
 				+ lineSeparator + "this.view = view || 'default';"
-				+ lineSeparator + "this.closed_width = closed_width;"
-				+ lineSeparator + "this.open_width = open_width;"
-				+ lineSeparator + "this.start_closed = start_closed;"
-				+ lineSeparator + "this.chrome_id = chrome_id;" + lineSeparator
+				+ lineSeparator + "this.chrome_id = chrome_id;" 
+				+ lineSeparator + "this.opt_params = opt_params;" + lineSeparator
 				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
 				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
 		for (String key : getPubsubData().keySet()) {
@@ -350,10 +375,7 @@ public class OpenSocialManager {
 			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
 					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
 					+ gadget.getSecurityToken() + "','" + gadget.getView()
-					+ "'," + gadget.getClosedWidth() + ","
-					+ gadget.getOpenWidth() + ","
-					+ (gadget.getStartClosed() ? "1" : "0") + ",'"
-					+ gadget.getChromeId() + "','"
+					+ "','" + gadget.getChromeId() + "'," + gadget.getOptParams() + ",'"
 					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
 		}
 		gadgetScriptText = gadgetScriptText.substring(0,
@@ -422,6 +444,7 @@ public class OpenSocialManager {
 				.getAttribute(OPENSOCIAL_GADGETS);
 		String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
 		for (String openSocialGadgetURL : urls) {
+			openSocialGadgetURL = openSocialGadgetURL.trim();
 			if (openSocialGadgetURL.length() == 0)
 				continue;
 			int appId = 0; // if URL matches one in the DB, use DB provided
@@ -436,7 +459,8 @@ public class OpenSocialManager {
 				channels = allDBGadgets.get(gadgetFileName).getChannels();
 				unknownGadget = false;
 			} else {
-				appId = openSocialGadgetURL.hashCode();
+				log.warn("Could not find " + gadgetFileName + " in " + allDBGadgets.keySet());
+				appId = Math.abs(openSocialGadgetURL.hashCode());
 			}
 			// if they asked for a specific one, only let it in
 			if (requestAppId != null && Integer.parseInt(requestAppId) != appId) {

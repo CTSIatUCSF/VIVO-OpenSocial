@@ -38,8 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 
 public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
@@ -48,11 +47,11 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
     private final List<ObjectPropertyStatementTemplateModel> statements;
     
     UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
-            VitroRequest vreq, EditingPolicyHelper policyHelper, 
+            VitroRequest vreq, boolean editing, 
             List<ObjectProperty> populatedObjectPropertyList)
         throws InvalidConfigurationException {
         
-        super(op, subject, vreq, policyHelper);
+        super(op, subject, vreq, editing);
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
         
         if (populatedObjectPropertyList.contains(op)) {
@@ -68,7 +67,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
             String objectKey = getObjectKey();
             for (Map<String, String> map : statementData) {
                 statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                        propertyUri, objectKey, map, policyHelper, getTemplateName(), vreq));
+                        propertyUri, objectKey, map, getTemplateName(), vreq));
             }
             
             postprocessStatementList(statements);

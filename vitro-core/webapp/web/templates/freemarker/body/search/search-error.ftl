@@ -29,7 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <#-- Template for displaying search error message -->
 
 <#if title??>
-    <h2>${title}</h2>
+    <h2>${title?html}</h2>
 </#if>
 
-<p>${message}</p>
+<p>
+${message?html}
+</p>

@@ -47,7 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultDataPropEmptyField;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
@@ -70,12 +70,14 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
 	    String predicateUri = vreq.getParameter("predicateUri");
 	    WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
 	    DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
+	    
+	    dataproperty = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI( predicateUri );
 	    if( dataproperty == null) {
 	        // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
 	        // This is controlled by the Jena layer, so we can't change the behavior.
 	        if (! predicateUri.equals(VitroVocabulary.LABEL)) {
 	            log.error("Could not find data property '"+predicateUri+"' in model");
-	            throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+	            throw new Error("Could not find DataProperty in model: " + predicateUri);
 	        }
 	    }
 	    
@@ -104,7 +106,6 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
     	
     	FieldVTwo literalField =  new FieldVTwo()
             .setName( literalVar )
-            .setPredicateUri(predicateUri)
             .setRangeDatatypeUri(rangeDatatypeUri);
     	        
     	editConfiguration.addField( literalField );    	    

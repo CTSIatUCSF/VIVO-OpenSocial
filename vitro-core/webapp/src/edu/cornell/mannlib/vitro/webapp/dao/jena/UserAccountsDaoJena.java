@@ -38,7 +38,6 @@ import java.util.Random;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -408,7 +407,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				Resource s = getOntModel().createResource(uri);
 				getOntModel().remove(s, p, o);
 			}
-			for (String uri: addThese) {
+			for (String uri : addThese) {
 				Resource s = getOntModel().createResource(uri);
 				getOntModel().add(s, p, o);
 			}
@@ -436,6 +435,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			PermissionSet ps = new PermissionSet();
 			ps.setUri(uri);
 			ps.setLabel(getPropertyStringValue(r, RDFS.label));
+			ps.setForNewUsers(isResourceOfType(r, PERMISSION_SET_FOR_NEW_USERS));
+			ps.setForPublic(isResourceOfType(r, PERMISSION_SET_FOR_PUBLIC));
 			ps.setPermissionUris(getPropertyResourceURIValues(r,
 					PERMISSIONSET_HAS_PERMISSION));
 			return ps;
@@ -460,6 +461,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					PermissionSet ps = new PermissionSet();
 					ps.setUri(r.getURI());
 					ps.setLabel(getPropertyStringValue(r, RDFS.label));
+					ps.setForNewUsers(isResourceOfType(r,
+							PERMISSION_SET_FOR_NEW_USERS));
+					ps.setForPublic(isResourceOfType(r,
+							PERMISSION_SET_FOR_PUBLIC));
 					ps.setPermissionUris(getPropertyResourceURIValues(r,
 							PERMISSIONSET_HAS_PERMISSION));
 					list.add(ps);

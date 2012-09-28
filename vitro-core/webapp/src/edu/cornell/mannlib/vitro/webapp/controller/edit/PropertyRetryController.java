@@ -56,16 +56,13 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -76,7 +73,7 @@ public class PropertyRetryController extends BaseEditController {
     
     @Override
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
             return;
         }
 
@@ -102,7 +99,6 @@ public class PropertyRetryController extends BaseEditController {
         epo.setDataAccessObject(propDao);
         OntologyDao ontDao = request.getFullWebappDaoFactory().getOntologyDao();
         VClassDao vclassDao = request.getFullWebappDaoFactory().getVClassDao();
-        DataPropertyDao dpDao = request.getFullWebappDaoFactory().getDataPropertyDao();
 
         ObjectProperty propertyForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -194,7 +190,9 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("inverseFunctional",propertyForEditing.getInverseFunctional());
         request.setAttribute("selectFromExisting",propertyForEditing.getSelectFromExisting());
         request.setAttribute("offerCreateNewOption", propertyForEditing.getOfferCreateNewOption());
-        request.setAttribute("stubObjectRelation", propertyForEditing.getStubObjectRelation());
+        //request.setAttribute("stubObjectRelation", propertyForEditing.getStubObjectRelation());
+        request.setAttribute("objectIndividualSortPropertyURI", propertyForEditing.getObjectIndividualSortPropertyURI());
+        request.setAttribute("domainEntitySortDirection", propertyForEditing.getDomainEntitySortDirection());
         request.setAttribute("collateBySubclass", propertyForEditing.getCollateBySubclass());
         
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
@@ -205,7 +203,7 @@ public class PropertyRetryController extends BaseEditController {
             propertyForEditing.setInverseFunctional(false);
             propertyForEditing.setSelectFromExisting(false);
             propertyForEditing.setOfferCreateNewOption(false);
-            propertyForEditing.setStubObjectRelation(false);
+            //propertyForEditing.setStubObjectRelation(false);
             propertyForEditing.setCollateBySubclass(false);
         }
 
@@ -215,7 +213,7 @@ public class PropertyRetryController extends BaseEditController {
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
-        request.setAttribute("colspan","4");
+        request.setAttribute("colspan","5");
         request.setAttribute("formJsp","/templates/edit/specific/property_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Property Editing Form");
@@ -271,17 +269,19 @@ public class PropertyRetryController extends BaseEditController {
         parentIdList.add(0,new Option("-1","none (root property)", false));
         optionMap.put("ParentURI", parentIdList);
         
-//        List<DataProperty> dpList = dpDao.getAllDataProperties();
-//        Collections.sort(dpList);
-//        List<Option> objectIndividualSortPropertyList = 
-//                FormUtils.makeOptionListFromBeans(
-//                        dpList, "URI", "Name", 
-//                        propertyForEditing.getObjectIndividualSortPropertyURI(),
-//                        null);
-//        objectIndividualSortPropertyList.add(0, new Option(
-//                "","- select data property -"));
-//        optionMap.put("ObjectIndividualSortPropertyURI", 
-//                objectIndividualSortPropertyList);
+        /*
+        List<DataProperty> dpList = dpDao.getAllDataProperties();
+        Collections.sort(dpList);
+        List<Option> objectIndividualSortPropertyList = 
+                FormUtils.makeOptionListFromBeans(
+                        dpList, "URI", "Name", 
+                        propertyForEditing.getObjectIndividualSortPropertyURI(),
+                        null);
+        objectIndividualSortPropertyList.add(0, new Option(
+                "","- name (rdfs:label) -"));
+        optionMap.put("ObjectIndividualSortPropertyURI", 
+                objectIndividualSortPropertyList);
+        */
         
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(
                 request.getFullWebappDaoFactory(), 

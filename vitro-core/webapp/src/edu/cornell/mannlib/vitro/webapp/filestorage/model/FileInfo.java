@@ -120,6 +120,7 @@ public class FileInfo {
 		String filename = surrogate.getDataValue(VitroVocabulary.FS_FILENAME);
 		if (filename == null) {
 			log.error("File had no filename: '" + uri + "'");
+			return null;
 		} else {
 			log.debug("Filename for '" + uri + "' was '" + filename + "'");
 		}
@@ -127,6 +128,7 @@ public class FileInfo {
 		String mimeType = surrogate.getDataValue(VitroVocabulary.FS_MIME_TYPE);
 		if (mimeType == null) {
 			log.error("File had no mimeType: '" + uri + "'");
+			return null;
 		} else {
 			log.debug("mimeType for '" + uri + "' was '" + mimeType + "'");
 		}
@@ -136,10 +138,21 @@ public class FileInfo {
 		if (byteStream == null) {
 			log.error("File surrogate '" + uri
 					+ "' had no associated bytestream.");
+			return null;
 		}
 
 		String bytestreamUri = findBytestreamUri(byteStream, uri);
+		if (bytestreamUri == null) {
+			log.error("Bytestream of file surrogate '" + uri + "' had no URI: "
+					+ byteStream);
+			return null;
+		}
+
 		String bytestreamAliasUrl = findBytestreamAliasUrl(byteStream, uri);
+		if (bytestreamAliasUrl == null) {
+			log.error("Bytestream  '" + bytestreamUri + "' had no alias URL.");
+			return null;
+		}
 
 		return new FileInfo.Builder().setUri(uri).setFilename(filename)
 				.setMimeType(mimeType).setBytestreamUri(bytestreamUri)

@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * Get more information (class label and image URL) about a selected proxy.
@@ -105,7 +105,7 @@ public class MoreProfileInfo extends AbstractAjaxResponder {
 	private String getFullImageUrl(Individual ind) {
 		String path = ind.getThumbUrl();
 		if ((path == null) || path.isEmpty()) {
-			path = ImageUtil.getPlaceholderImagePathForIndividual(vreq,
+			path = PlaceholderUtil.getPlaceholderImagePathForIndividual(vreq,
 					ind.getURI());
 		}
 		return UrlBuilder.getUrl(path);

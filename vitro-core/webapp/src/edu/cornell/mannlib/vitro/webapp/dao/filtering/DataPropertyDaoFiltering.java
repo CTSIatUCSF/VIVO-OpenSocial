@@ -239,4 +239,9 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
         return innerDataPropertyDao.getDataPropertyList(subjectUri);
     }
 
+    @Override
+    public String getCustomListViewConfigFileName(DataProperty dataProperty) {
+        return innerDataPropertyDao.getCustomListViewConfigFileName(dataProperty);
+    }
+
 }

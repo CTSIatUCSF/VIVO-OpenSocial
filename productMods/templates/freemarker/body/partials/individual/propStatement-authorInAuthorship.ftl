@@ -40,7 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <#-- Use a macro to keep variable assignments local; otherwise the values carry over to the
      next statement -->
 <#macro showAuthorship statement>
-
+<#if statement.hideThis?has_content>
+    <span class="hideThis">&nbsp;</span>
+    <script type="text/javascript" >
+        $('span.hideThis').parent().parent().addClass("hideThis");
+        if ( $('h3#authorInAuthorship').attr('class').length == 0 ) {
+            $('h3#authorInAuthorship').addClass('hiddenPubs');
+        }
+        $('span.hideThis').parent().remove();
+    </script>
+<#else>
     <#local citationDetails>
         <#if statement.subclass??>
             <#if statement.subclass?contains("Article")>
@@ -129,5 +138,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </#local>
 
     ${resourceTitle} ${citationDetails} <@dt.yearSpan "${statement.dateTime!}" />
-
+</#if>
 </#macro>

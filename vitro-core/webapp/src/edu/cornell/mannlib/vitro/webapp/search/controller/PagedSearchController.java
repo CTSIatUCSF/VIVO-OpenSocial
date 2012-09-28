@@ -79,7 +79,6 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import edu.ucsf.vitro.opensocial.OpenSocialManager;
-import freemarker.template.Configuration;
 
 /**
  * Paged search controller that uses Solr
@@ -132,12 +131,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             super.doGet(vreq,response);
         }else{
             try {                
-                Configuration config = getConfig(vreq);            
                 ResponseValues rvalues = processRequest(vreq);
                 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
-                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), config, request, response);
+                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
             }
@@ -365,23 +363,14 @@ public class PagedSearchController extends FreemarkerHttpServlet {
      * Get the class groups represented for the individuals in the documents.
      * @param qtxt 
      */
-    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {        
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
-        if( rsp == null )
-            return Collections.emptyList();
         
         List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
         List<FacetField> ffs = rsp.getFacetFields();
-        if( ffs == null )
-            return Collections.emptyList();
-        
         for(FacetField ff : ffs){
-            if( ff == null )
-                continue;
             if(VitroSearchTermNames.CLASSGROUP_URI.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
-                if( counts == null )
-                    continue;
                 for( Count ct: counts){                    
                     VClassGroup vcg = grpDao.getGroupByURI( ct.getName() );
                     if( vcg == null ){
@@ -406,23 +395,15 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return classGroupLinks;
     }
 
-    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){
-        if( rsp == null )
-            return Collections.emptyList();
-        
+    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){        
         HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
         Map<String,Long> typeURItoCount = new HashMap<String,Long>();        
         
         List<FacetField> ffs = rsp.getFacetFields();
-        if( ffs == null )
-            return Collections.emptyList();
-        
         for(FacetField ff : ffs){
             if(VitroSearchTermNames.RDFTYPE.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
-                if( counts == null )
-                    continue;
                 for( Count ct: counts){  
                     String typeUri = ct.getName();
                     long count = ct.getCount();
@@ -639,7 +620,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Makes a message to display to user for a bad search term.
-     * @param query
+     * @param queryText
      * @param exceptionMsg
      */
     private String makeBadSearchMessage(String querytext, String exceptionMsg){

@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	                <input type="radio" name="format" value="RDF/XML-ABBREV" checked="checked" selected="selected"/> RDF/XML abbreviated
 	                <input type="radio" name="format" value="RDF/XML"/> RDF/XML
 	                <input type="radio" name="format" value="N3"/> N3
-	                <input type="radio" name="format" value="N-TRIPLES"/> N-Triples
+	                <input type="radio" name="format" value="N-TRIPLE"/> N-Triples
 	                <input type="radio" name="format" value="TURTLE"/> Turtle
                 </div>
             </form>

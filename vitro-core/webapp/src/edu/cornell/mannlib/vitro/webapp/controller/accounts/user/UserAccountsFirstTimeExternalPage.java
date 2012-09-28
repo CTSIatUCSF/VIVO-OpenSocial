@@ -150,6 +150,11 @@ public class UserAccountsFirstTimeExternalPage extends UserAccountsPage {
 					+ "'";
 			return;
 		}
+		if (!Authenticator.getInstance(vreq).isUserPermittedToLogin(null)) {
+			bogusMessage = "User logins are temporarily disabled "
+					+ "while the system is being maintained.";
+			return;
+		}
 	}
 
 	public boolean isBogus() {

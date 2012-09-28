@@ -356,7 +356,7 @@ public class MapOfScienceConstants {
 		put(298, "AIDS Treatment");
 		put(299, "Wireless Communication");
 		put(300, "Atherosclerosis");
-		put(301, "Region & Medical Ethids");
+		put(301, "Region & Medical Ethics");
 		put(302, "Speech Language & Hearing");
 		put(303, "Thoracic & Respiratory");
 		put(304, "Veterinary Microbiology");
@@ -367,7 +367,7 @@ public class MapOfScienceConstants {
 		put(309, "Endoscopy");
 		put(310, "Chemistry & Material Science");
 		put(311, "Medical Screening & Epidemiology");
-		put(312, "Child Develomoent");
+		put(312, "Child Development");
 		put(313, "Pain");
 		put(314, "Public Administration");
 		put(315, "Soil Analysis");
@@ -406,7 +406,7 @@ public class MapOfScienceConstants {
 		put(348, "Literary Criticism");
 		put(349, "Hepatology");
 		put(350, "Physical Therapy; Brain Injury");
-		put(351, "Computational& Applied Math");
+		put(351, "Computational & Applied Math");
 		put(352, "World Health Organization");
 		put(353, "Geophysical Science");
 		put(354, "Forensic Medicine");
@@ -419,7 +419,7 @@ public class MapOfScienceConstants {
 		put(361, "Microbiology Biotechnology");
 		put(362, "Water Utilities");
 		put(363, "Sedimentary Geology");
-		put(364, "Giodesy");
+		put(364, "Geodesy");
 		put(365, "Surfactants");
 		put(366, "Eye");
 		put(367, "Addictive Behavior");
@@ -502,7 +502,7 @@ public class MapOfScienceConstants {
 		put(444, "Engineering Education");
 		put(445, "NeuroImmunology");
 		put(446, "Machine Learning");
-		put(447, "Geratric Nursing");
+		put(447, "Geriatric Nursing");
 		put(448, "Sensors & Actuators");
 		put(449, "Systematics & Evolutionary Microbiology");
 		put(450, "Image Processing");
@@ -519,7 +519,7 @@ public class MapOfScienceConstants {
 		put(461, "Wildlife Research");
 		put(462, "Midwifery");
 		put(463, "Physics; Current Developments");
-		put(464, "Pychiatric & Behavioral Genetics");
+		put(464, "Psychiatric & Behavioral Genetics");
 		put(465, "Fractures & Fatigue");
 		put(466, "Emergency Medicine");
 		put(467, "Cross Disciplinary Studies");
@@ -533,7 +533,7 @@ public class MapOfScienceConstants {
 		put(475, "Medical Practice");
 		put(476, "Cancer Statistics");
 		put(477, "Consciousness");
-		put(478, "Otolyngology; Head Neck");
+		put(478, "Otolaryngology; Head Neck");
 		put(479, "Heart Failure; Catheters");
 		put(480, "Wood & Wood Components");
 		put(481, "Circuits");

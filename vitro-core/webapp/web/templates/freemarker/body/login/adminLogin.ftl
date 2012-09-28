@@ -39,6 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <#assign errorMessage = "No password supplied." />
     </#if>
     
+    <#if errorLoginDisabled??>
+        <#assign errorMessage = "User logins are temporarily disabled while the system is being maintained." />
+    </#if>
+    
     <#if errorLoginFailed??>
         <#assign errorMessage = "Email or Password was incorrect." />
     </#if>

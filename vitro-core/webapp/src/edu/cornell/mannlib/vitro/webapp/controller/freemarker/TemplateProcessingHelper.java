@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -53,8 +53,8 @@ public class TemplateProcessingHelper {
     private HttpServletRequest request = null;
     private ServletContext context = null;
     
-    public TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
-        this.config = config;
+    public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
+        this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
         this.request = request;
         this.context = context;
     }
@@ -67,13 +67,6 @@ public class TemplateProcessingHelper {
         return sw;
     }
     
-    protected StringWriter processTemplate(ResponseValues values) throws TemplateProcessingException {
-        if (values == null) {
-            return null;
-        }
-        return processTemplate(values.getTemplateName(), values.getMap());
-    }
-
     private void processTemplate(Template template, Map<String, Object> map, Writer writer)
         throws TemplateProcessingException {
         
@@ -98,18 +91,6 @@ public class TemplateProcessingHelper {
         }        
     }
 
-    // For cases where we need a String instead of a StringWriter. StringWriter objects can be put in the template data model,
-    // but we can use this method from a jsp, for example.
-    public String processTemplateToString(String templateName, Map<String, Object> map) 
-            throws TemplateProcessingException {
-        return processTemplate(templateName, map).toString();
-    }
-
-    protected String processTemplateToString(ResponseValues values) 
-            throws TemplateProcessingException {
-        return processTemplate(values).toString();
-    }
-    
     private Template getTemplate(String templateName) throws TemplateProcessingException {
         Template template = null;
         try {

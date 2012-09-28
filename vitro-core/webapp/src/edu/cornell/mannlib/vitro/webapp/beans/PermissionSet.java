@@ -44,6 +44,9 @@ public class PermissionSet {
 	/** This may be empty, but it should never be null. */
 	private String label = "";
 
+	private boolean forNewUsers;
+	private boolean forPublic;
+
 	/** This may be empty, but it should never be null. */
 	private Set<String> permissionUris = Collections.emptySet();
 
@@ -61,6 +64,24 @@ public class PermissionSet {
 
 	public void setLabel(String label) {
 		this.label = (label == null) ? "" : label;
+	}
+
+	public boolean isForNewUsers() {
+		return forNewUsers;
+	}
+
+	public void setForNewUsers(Boolean forNewUsers) {
+		this.forNewUsers = (forNewUsers == null) ? false
+				: forNewUsers.booleanValue();
+	}
+
+	public boolean isForPublic() {
+		return forPublic;
+	}
+
+	public void setForPublic(Boolean forPublic) {
+		this.forPublic = (forPublic == null) ? false
+				: forPublic.booleanValue();
 	}
 
 	public Set<String> getPermissionUris() {

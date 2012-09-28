@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </#if>   
 
     
-    <textarea rows="2"  id="literal" name="literal" value="${literalValues}" class="useTinyMce" role="textarea">${literalValues}</textarea>
+    <textarea rows="2"  id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
 
     <br />
     <#--The submit label should be set within the template itself, right now

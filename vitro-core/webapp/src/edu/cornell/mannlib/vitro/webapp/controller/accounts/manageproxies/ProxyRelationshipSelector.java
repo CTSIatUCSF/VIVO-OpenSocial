@@ -120,8 +120,8 @@ public class ProxyRelationshipSelector {
 				PREFIX_LINES);
 		qString = replaceFilterClauses(qString);
 
-		int count = new SparqlQueryRunner<Integer>(context.userAccountsModel,
-				new CountQueryParser()).executeQuery(qString);
+		int count = new SparqlQueryRunner(context.userAccountsModel)
+				.executeSelect(new CountQueryParser(), qString);
 
 		log.debug("result count: " + count);
 		builder.count = count;
@@ -133,8 +133,8 @@ public class ProxyRelationshipSelector {
 			return q.replace("%filterClause%", "");
 		} else {
 			String clean = SparqlQueryUtils.escapeForRegex(searchTerm);
-			return q.replace("%filterClause%",
-					"FILTER (REGEX(str(?label), '^" + clean + "', 'i'))");
+			return q.replace("%filterClause%", "FILTER (REGEX(str(?label), '^"
+					+ clean + "', 'i'))");
 		}
 	}
 
@@ -162,9 +162,9 @@ public class ProxyRelationshipSelector {
 				.replace("%offset%", offset());
 		qString = replaceFilterClauses(qString);
 
-		List<Relationship> relationships = new SparqlQueryRunner<List<Relationship>>(
-				context.userAccountsModel, new ProxyBasicsParser())
-				.executeQuery(qString);
+		List<Relationship> relationships = new SparqlQueryRunner(
+				context.userAccountsModel).executeSelect(
+				new ProxyBasicsParser(), qString);
 		log.debug("getProxyBasics returns: " + relationships);
 		builder.relationships.addAll(relationships);
 	}
@@ -203,9 +203,8 @@ public class ProxyRelationshipSelector {
 						.replace("%matchingProperty%", context.matchingProperty)
 						.replace("%externalAuthId%", proxy.externalAuthId);
 
-				ItemInfo expansion = new SparqlQueryRunner<ItemInfo>(
-						context.unionModel, new ExpandProxyParser())
-						.executeQuery(qString);
+				ItemInfo expansion = new SparqlQueryRunner(context.unionModel)
+						.executeSelect(new ExpandProxyParser(), qString);
 				proxy.classLabel = expansion.classLabel;
 				proxy.imageUrl = expansion.imageUrl;
 			}
@@ -226,9 +225,9 @@ public class ProxyRelationshipSelector {
 				String qString = QUERY_RELATIONSHIPS.replace("%prefixes%",
 						PREFIX_LINES).replace("%proxyUri%", proxy.uri);
 
-				List<String> profileUris = new SparqlQueryRunner<List<String>>(
-						context.userAccountsModel, new RelationshipsParser())
-						.executeQuery(qString);
+				List<String> profileUris = new SparqlQueryRunner(
+						context.userAccountsModel).executeSelect(
+						new RelationshipsParser(), qString);
 
 				for (String profileUri : profileUris) {
 					r.profileInfos
@@ -262,9 +261,8 @@ public class ProxyRelationshipSelector {
 				String qString = QUERY_EXPAND_PROFILE.replace("%prefixes%",
 						PREFIX_LINES).replace("%profileUri%", profile.uri);
 
-				ItemInfo expansion = new SparqlQueryRunner<ItemInfo>(
-						context.unionModel, new ExpandProfileParser())
-						.executeQuery(qString);
+				ItemInfo expansion = new SparqlQueryRunner(context.unionModel)
+						.executeSelect(new ExpandProfileParser(), qString);
 				profile.label = expansion.label;
 				profile.classLabel = expansion.classLabel;
 				profile.imageUrl = expansion.imageUrl;

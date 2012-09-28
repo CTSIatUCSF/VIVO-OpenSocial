@@ -28,6 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <#-- Template for help on individual page -->
 
-<h2>Quick Notes on Using Individual:</h2>
+<h2>Individual not found:</h2>
 
 <p>id is the id of the entity to query for. netid also works.</p>

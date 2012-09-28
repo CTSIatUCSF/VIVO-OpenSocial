@@ -43,4 +43,13 @@ public class DisplayDataPropertyStatement extends RequestedAction {
 	public DataPropertyStatement getDataPropertyStatement() {
 		return dataPropertyStatement;
 	}
+
+	@Override
+	public String toString() {
+		return "DisplayDataPropertyStatement["
+				+ dataPropertyStatement.getIndividualURI() + "==>"
+				+ dataPropertyStatement.getDatapropURI() + "==>"
+				+ dataPropertyStatement.getData() + "]";
+	}
+
 }

@@ -43,7 +43,7 @@ showRoleLAbelField
 roleExamples-->
 
 
-<#--Variable assignments for Add Clinical Role To Person-->
+<#--Variable assignments for Add Service Provider Role To Person-->
 <#assign roleDescriptor = "service to the profession" />
 <#assign typeSelectorLabel = "service to the profession in" />
 <#assign buttonText = "Service Provider Role" />

@@ -173,7 +173,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 		for(VClass r: restrictClasses) {
 			classUris.add(r.getURI());
 		}
-		long count =  DataGetterUtils.getIndividualCountForIntersection(vreq, context, classUris);
+		long count =  PageDataGetterUtils.getIndividualCountForIntersection(vreq, context, classUris);
 		return new Long(count).intValue();
 
 	}
@@ -302,7 +302,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     }
     
     public String getType(){
-        return DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
+        return PageDataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
     } 
     
     //Get data servuice
@@ -313,7 +313,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
      * For processig of JSONObject
      */
     public JSONObject convertToJSON(Map<String, Object> map, VitroRequest vreq) {
-    	JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, true);
+    	JSONObject rObj = PageDataGetterUtils.processVclassResultsJSON(map, vreq, true);
     	return rObj;
     }
     

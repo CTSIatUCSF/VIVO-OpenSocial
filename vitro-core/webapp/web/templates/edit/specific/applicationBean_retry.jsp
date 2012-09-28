@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals" %>
-<% request.setAttribute("requestedActions", new ManagePortals()); %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<% request.setAttribute("requestedActions", SimplePermission.MANAGE_PORTALS.ACTION); %>
 <vitro:confirmAuthorization />
 
 <c:set var="appNameLabel" value="Site name"/> 

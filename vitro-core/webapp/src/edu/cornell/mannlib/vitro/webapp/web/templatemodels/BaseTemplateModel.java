@@ -30,8 +30,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,8 +43,6 @@ public abstract class BaseTemplateModel {
 
 	private static final String URI_CHARACTERS = 
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&%'()*+,;=";
-    
-    protected static ServletContext servletContext;
     
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {
@@ -97,14 +93,6 @@ public abstract class BaseTemplateModel {
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
         AntiScript.cleanMapValues(map);
-    }
-    
-    protected static ServletContext getServletContext() {
-        return servletContext;
-    }
-
-    public static void setServletContext(ServletContext context) {
-        servletContext = context;
     }
     
 }

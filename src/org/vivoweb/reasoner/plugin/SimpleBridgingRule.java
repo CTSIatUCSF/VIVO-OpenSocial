@@ -45,6 +45,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
 /**
  * handles rules of the form
@@ -60,6 +61,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 	private Property assertedProp1;
 	private Property assertedProp2;
 	private String   queryStr;
+	private SimpleReasoner simpleReasoner;
 	
 	protected SimpleBridgingRule(String assertedProp1, String assertedProp2, String inferredProp) {
 		this.assertedProp1 = ResourceFactory.createProperty(assertedProp1);
@@ -92,7 +94,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         StmtIterator sit = inf.listStatements();
         while(sit.hasNext()) {
         	Statement s = sit.nextStatement();
-        	tryToInfer(s, aboxAssertionsModel, aboxInferencesModel);
+        	if (simpleReasoner != null) simpleReasoner.addInference(s,aboxInferencesModel);
         }     
 	}
 	
@@ -132,16 +134,6 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 		
 	}
 	
-	private void tryToInfer(Statement s, 
-			                Model aboxAssertionsModel, 
-			                Model aboxInferencesModel) {
-		// this should be part of a superclass or some class that provides
-		// reasoning framework functions
-		if (!aboxAssertionsModel.contains(s) && !aboxInferencesModel.contains(s)) {
-			aboxInferencesModel.add(s);
-		}
-	}
-
     public void removedABoxStatement(Statement stmt, 
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
@@ -157,6 +149,13 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 		Model m = ModelFactory.createDefaultModel();
 		m.add(stmt);
 		Model union = ModelFactory.createUnion(m, aboxAssertionsModel);
+		Model inf = constructInferences(stmt, union);
+        StmtIterator sit = inf.listStatements();
+        while(sit.hasNext()) {
+        	Statement s = sit.nextStatement();
+        	if (simpleReasoner != null) simpleReasoner.removeInference(s,aboxInferencesModel);
+        }     
+		
         aboxInferencesModel.remove(constructInferences(stmt, union));  
     }
 	
@@ -164,6 +163,13 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 		return (assertedProp1.equals(stmt.getPredicate())
 				|| assertedProp2.equals(stmt.getPredicate()));
     }
-
+    
+	public void setSimpleReasoner(SimpleReasoner simpleReasoner) {
+		this.simpleReasoner = simpleReasoner;
+	}
+	
+	public SimpleReasoner getSimpleReasoner() {
+		return this.simpleReasoner;		
+	}
 }
 

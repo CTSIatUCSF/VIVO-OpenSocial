@@ -44,6 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 
 /**
  * Provide a means for programmatic login If they provide the right parameters,
@@ -55,13 +56,18 @@ public class ProgramLogin extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		new ProgramLoginCore(req, resp).process();
+		try {
+			new ProgramLoginCore(req, resp).process();
+		} catch (LoginNotPermitted e) {
+			// This should have been prevented by the test for loginDisabled()
+			throw new ServletException(e);
+		}
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		new ProgramLoginCore(req, resp).process();
+		doGet(req, resp);
 	}
 
 	static class ProgramLoginCore {
@@ -76,6 +82,8 @@ public class ProgramLogin extends HttpServlet {
 				+ " parameter is required.";
 		private static final String MESSAGE_WRONG_USER_OR_PASSWORD = PARAM_EMAIL_ADDRESS
 				+ " or " + PARAM_PASSWORD + " is incorrect.";
+		private static final String MESSAGE_LOGIN_DISABLED = "User logins are "
+				+ "temporarily disabled while the system is being maintained.";
 		private static final String MESSAGE_NEED_NEW_PASSWORD = "first-time login: "
 				+ PARAM_NEW_PASSWORD + " parameter is required.";
 		private static final String MESSAGE_NEW_PASSWORD_NOT_NEEDED = "not first-time login: "
@@ -116,7 +124,7 @@ public class ProgramLogin extends HttpServlet {
 					.getAccountForInternalAuth(this.emailAddress);
 		}
 
-		void process() throws IOException {
+		void process() throws IOException, LoginNotPermitted {
 			if (emailAddress.isEmpty()) {
 				sendError(MESSAGE_NEED_EMAIL_ADDRESS);
 				return;
@@ -127,6 +135,11 @@ public class ProgramLogin extends HttpServlet {
 			}
 			if (!usernameAndPasswordAreValid()) {
 				sendError(MESSAGE_WRONG_USER_OR_PASSWORD);
+				return;
+			}
+
+			if (loginDisabled()) {
+				sendError(MESSAGE_LOGIN_DISABLED);
 				return;
 			}
 
@@ -173,6 +186,10 @@ public class ProgramLogin extends HttpServlet {
 			return auth.isCurrentPassword(userAccount, password);
 		}
 
+		private boolean loginDisabled() {
+			return !auth.isUserPermittedToLogin(userAccount);
+		}
+
 		private boolean newPasswordIsValidPasswordLength() {
 			return (newPassword.length() >= MIN_PASSWORD_LENGTH)
 					&& (newPassword.length() <= MAX_PASSWORD_LENGTH);
@@ -186,11 +203,11 @@ public class ProgramLogin extends HttpServlet {
 			return (userAccount.isPasswordChangeRequired());
 		}
 
-		private void recordLogin() {
+		private void recordLogin() throws LoginNotPermitted {
 			auth.recordLoginAgainstUserAccount(userAccount, INTERNAL);
 		}
 
-		private void recordLoginWithPasswordChange() {
+		private void recordLoginWithPasswordChange() throws LoginNotPermitted {
 			auth.recordNewPassword(userAccount, newPassword);
 			auth.recordLoginAgainstUserAccount(userAccount, INTERNAL);
 		}

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	</tr>
 	<tr class="editformcell">
 		<td valign="bottom" colspan="3">
-            <b>Namespace URI*</b><br/>
+            <b>Namespace URI*</b>&nbsp;<span class="note"> (must begin with http:// or https://)</span><br/>
              <c:choose>
                <c:when test="${_action eq 'update'}">
                     <i>Change via the "change URI" button on previous screen</i><br/>
@@ -63,4 +63,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </c:if>
 		</td>
 	</tr>
-
+<script  type="text/javascript">
+    $('form#editForm').submit(function() {
+        var str = $('input[name=URI]').val();
+        if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
+            return true;
+        }
+        else {
+            alert('The Namespace URI must begin with either http:// \n\n or https://');
+            $('input[name=URI]').focus();
+            return false;
+        }
+    });
+</script>

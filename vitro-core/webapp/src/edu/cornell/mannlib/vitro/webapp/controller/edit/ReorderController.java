@@ -36,20 +36,18 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 
-
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
@@ -74,7 +72,7 @@ public class ReorderController extends VitroAjaxController {
 
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseBasicAjaxControllers());
+    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTIONS;
     }
     
    @Override
@@ -134,7 +132,7 @@ public class ReorderController extends VitroAjaxController {
     
     private void reorderIndividuals(String[] individualUris, VitroRequest vreq, String rankPredicate) {
     	//Testing new mechanism
-    	OntModel writeModel = vreq.getJenaOntModel();
+    	OntModel writeModel = vreq.getOntModelSelector().getABoxModel();
     	Model additions = ModelFactory.createDefaultModel();
         Model retractions = ModelFactory.createDefaultModel();
     	Property rankPredicateProperty = ResourceFactory.createProperty(rankPredicate);
@@ -145,6 +143,7 @@ public class ReorderController extends VitroAjaxController {
         	Resource individualResource = ResourceFactory.createResource(individualUri);
         	//Deletions are all old statements with rank predicate
         	retractions.add(writeModel.listStatements(individualResource, rankPredicateProperty, (RDFNode) null));
+        	log.debug("retractions = " + retractions);
         	//New statement is new literal with the data property from
         	Literal dataLiteral = null;
         	if(datapropURI != null && datapropURI.length() > 0) {
@@ -154,6 +153,7 @@ public class ReorderController extends VitroAjaxController {
 
         	}
         	additions.add(individualResource, rankPredicateProperty, dataLiteral);
+        	log.debug("additions = " + additions);
         	counter++;
         }
         
@@ -162,8 +162,8 @@ public class ReorderController extends VitroAjaxController {
             lock =  writeModel.getLock();
             lock.enterCriticalSection(Lock.WRITE);
             writeModel.getBaseModel().notifyEvent(new EditEvent(null,true));   
-            writeModel.add( additions );
             writeModel.remove( retractions );
+            writeModel.add( additions );
         }catch(Throwable t){
             log.error("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
         }finally{

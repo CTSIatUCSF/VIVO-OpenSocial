@@ -61,6 +61,7 @@ import org.xml.sax.SAXException;
 import edu.cornell.mannlib.semservices.bo.Concept;
 import edu.cornell.mannlib.semservices.service.ExternalConceptService;
 import edu.cornell.mannlib.semservices.util.XMLUtils;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class GemetService implements ExternalConceptService  {
    protected final Log logger = LogFactory.getLog(getClass());
@@ -76,9 +77,7 @@ public class GemetService implements ExternalConceptService  {
    private final String acronymLabelUri = "http://www.w3.org/2004/02/skos/core%23acronymLabel";
 
    public List<Concept> processResults(String term) throws Exception {
-      List<Concept> conceptList = new ArrayList<Concept>();
-      String results = getConceptsMatchingKeyword(term);
-      conceptList = processOutput(results);
+      List<Concept> conceptList = processConceptsAndRelatedMatchingKeyword(term);
       return conceptList;
 
    }
@@ -86,11 +85,15 @@ public class GemetService implements ExternalConceptService  {
    /**
     * @param results
     * @return
+    * By default, concepts set with best match = true
     */
    private List<Concept> processOutput(String results) {
+     return processOutput(results, "true");
 
-      List<Concept> conceptList = new ArrayList<Concept>();
-
+   }
+   
+   private List<Concept> processOutput(String results, String bestMatch) {
+	  List<Concept> conceptList = new ArrayList<Concept>();
       try {
          JSONArray jsonArray = (JSONArray) JSONSerializer.toJSON( results );
 	   
@@ -98,7 +101,7 @@ public class GemetService implements ExternalConceptService  {
 				Concept concept = new Concept();
 				concept
 						.setDefinedBy("http://www.eionet.europa.eu/gemet/gemetThesaurus");
-				concept.setBestMatch("true");
+				concept.setBestMatch(bestMatch);
 				JSONObject json = jsonArray.getJSONObject(i);
 				String uri = getJsonValue(json, "uri");
 
@@ -129,7 +132,6 @@ public class GemetService implements ExternalConceptService  {
          logger.error("Could not get concepts", ex);
       }
       return conceptList;
-
    }
 
    /**
@@ -212,7 +214,7 @@ public class GemetService implements ExternalConceptService  {
    protected String getConceptsMatchingKeyword(String keyword) throws Exception {
       String result = new String();
       String serviceUrl = GemetWS_address + "getConceptsMatchingKeyword" +
-      "?keyword="  + keyword +
+      "?keyword="  + URLEncoder.encode(keyword) +
       "&search_mode=0" +
       "&thesaurus_uri=http://www.eionet.europa.eu/gemet/concept/" +
       "&language=en";
@@ -221,6 +223,21 @@ public class GemetService implements ExternalConceptService  {
       return result;
 
    }
+   
+   //Get concepts matching keyword plus any related concepts
+   protected List<Concept> processConceptsAndRelatedMatchingKeyword(String keyword) throws Exception {
+	      String result = getConceptsMatchingKeyword(keyword);
+	      //iterate through each of the concepts and add related concepts a well
+	      List<Concept> bestMatchConceptList = processOutput(result);
+	      List<Concept> relatedConceptList = new ArrayList<Concept>();
+	      for(Concept c: bestMatchConceptList) {
+	    	  String conceptUri = c.getUri();
+	    	  String resultsRelated = getRelatedConcepts(conceptUri, "related");
+	    	  relatedConceptList.addAll(processOutput(resultsRelated, "false"));
+	      }
+	      bestMatchConceptList.addAll(relatedConceptList);
+	      return bestMatchConceptList;
+	   }
 
    protected String getGemetResults(String url) throws Exception {
       String results = new String();

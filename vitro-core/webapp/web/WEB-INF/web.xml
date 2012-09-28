@@ -227,30 +227,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>MenuN3EditController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.MenuN3EditController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MenuN3EditController</servlet-name>
-    <url-pattern>/menuN3Editor</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>MenuManagementController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.MenuManagementController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MenuManagementController</servlet-name>
-    <url-pattern>/editDisplayModel</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>MenuManagementEdit</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.MenuManagementEdit</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>MenuManagementEdit</servlet-name>
-    <url-pattern>/processEditDisplayModel</url-pattern>
+    <url-pattern>/menuManagementEdit</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -385,6 +367,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <url-pattern>/deletePropertyController</url-pattern>
   </servlet-mapping>
   
+  
+  
    <servlet>
     <servlet-name>PostEditCleanupController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.PostEditCleanupController</servlet-class>
@@ -392,6 +376,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <servlet-mapping>
     <servlet-name>PostEditCleanupController</servlet-name>
     <url-pattern>/postEditCleanupController</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>DeletePageController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.DeletePageController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeletePageController</servlet-name>
+    <url-pattern>/deletePageController</url-pattern>
   </servlet-mapping>
   
   <servlet>
@@ -640,20 +633,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>AllClassGroupsListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllClassGroupsListingController</servlet-class>
+    <servlet-name>ListClassGroupsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListClassGroupsController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>AllClassGroupsListingController</servlet-name>
+    <servlet-name>ListClassGroupsController</servlet-name>
     <url-pattern>/listGroups</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PropertyGroupsListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PropertyGroupsListingController</servlet-class>
+    <servlet-name>ListPropertyGroupsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListPropertyGroupsController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>PropertyGroupsListingController</servlet-name>
+    <servlet-name>ListPropertyGroupsController</servlet-name>
     <url-pattern>/listPropertyGroups</url-pattern>
   </servlet-mapping>
 
@@ -721,6 +714,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>ManageLabelsForIndividualController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ManageLabelsForIndividualController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManageLabelsForIndividualController</servlet-name>
+    <url-pattern>/manageLabels</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>ManageProxies</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ManageProxiesController</servlet-class>
   </servlet>
@@ -757,6 +759,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>RestrictLogins</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.admin.RestrictLoginsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RestrictLogins</servlet-name>
+    <url-pattern>/admin/restrictLogins</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>StatementChangeListingController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.jena.StatementChangeListingController</servlet-class>
   </servlet>
@@ -775,11 +786,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>VClassWebappsListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.VClassWebappsListingController</servlet-class>
+    <servlet-name>ListVClassWebappsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListVClassWebappsController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>VClassWebappsListingController</servlet-name>
+    <servlet-name>ListVClassWebappsController</servlet-name>
     <url-pattern>/listVClassWebapps</url-pattern>
   </servlet-mapping>
 
@@ -794,47 +805,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
   <servlet>
-    <servlet-name>ClassHierarchyListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.ClassHierarchyListingController</servlet-class>
+    <servlet-name>ShowClassHierarchyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ShowClassHierarchyController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ClassHierarchyListingController</servlet-name>
+    <servlet-name>ShowClassHierarchyController</servlet-name>
     <url-pattern>/showClassHierarchy</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>ObjectPropertyHierarchyListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.ObjectPropertyHierarchyListingController</servlet-class>
+    <servlet-name>ShowObjectPropertyHierarchyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ShowObjectPropertyHierarchyController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ObjectPropertyHierarchyListingController</servlet-name>
+    <servlet-name>ShowObjectPropertyHierarchyController</servlet-name>
     <url-pattern>/showObjectPropertyHierarchy</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>DataPropertyHierarchyListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.DataPropertyHierarchyListingController</servlet-class>
+    <servlet-name>ShowDataPropertyHierarchyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ShowDataPropertyHierarchyController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>DataPropertyHierarchyListingController</servlet-name>
+    <servlet-name>ShowDataPropertyHierarchyController</servlet-name>
     <url-pattern>/showDataPropertyHierarchy</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PropertyWebappsListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PropertyWebappsListingController</servlet-class>
+    <servlet-name>ListPropertyWebappsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListPropertyWebappsController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>PropertyWebappsListingController</servlet-name>
+    <servlet-name>ListPropertyWebappsController</servlet-name>
     <url-pattern>/listPropertyWebapps</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>DatatypePropertiesListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.DatatypePropertiesListingController</servlet-class>
+    <servlet-name>ListDatatypePropertiesController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListDatatypePropertiesController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>DatatypePropertiesListingController</servlet-name>
+    <servlet-name>ListDatatypePropertiesController</servlet-name>
     <url-pattern>/listDatatypeProperties</url-pattern>
   </servlet-mapping>
 
@@ -909,7 +920,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <servlet-name>AutocompleteController</servlet-name>
     <url-pattern>/populateselect</url-pattern>
   </servlet-mapping>
-
+  
+  <servlet>
+    <servlet-name>DataAutocompleteController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.DataAutocompleteController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataAutocompleteController</servlet-name>
+    <url-pattern>/dataautocomplete</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>ReorderController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController</servlet-class>
@@ -948,7 +967,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <servlet>
     <servlet-name>JSON Service</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JsonServlet</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JSON Service</servlet-name>
@@ -1004,7 +1023,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <servlet>
     <servlet-name>individual</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualController</servlet-class>
   </servlet>
     
   <servlet>
@@ -1144,15 +1163,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <servlet-mapping>
     <servlet-name>VisualizationController</servlet-name>
     <url-pattern>/visualization</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>authtest</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.auth.AuthTestController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>authtest</servlet-name>
-    <url-pattern>/authtest</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -1325,12 +1335,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </servlet>
   <servlet-mapping>
     <servlet-name>GadgetController</servlet-name>
-    <url-pattern>/gadget</url-pattern>
+    <url-pattern>/orng/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>GadgetController</servlet-name>
-    <url-pattern>/gadget/sandbox</url-pattern>
-  </servlet-mapping>
+
 
   <!-- ==================== tag libraries ============================== -->
   <jsp-config>

@@ -39,7 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         SELECT DISTINCT <collated>?subclass</collated> 
                         ?position
                         ?positionTitle    
-                        ?hrJobTitle                    
+                        ?hrJobTitle  
+                        ?rank                  
                         ?org ?orgName 
                         ?middleOrg ?middleOrgName
                         ?outerOrg ?outerOrgName
@@ -56,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             }
             OPTIONAL { ?position rdfs:label ?positionTitle } 
             OPTIONAL { ?position core:hrJobTitle ?hrJobTitle }
+            OPTIONAL { ?position core:rank ?rank }
             OPTIONAL { ?position core:dateTimeInterval ?dateTimeInterval 
                        OPTIONAL { ?dateTimeInterval core:start ?dateTimeStartValue .                     
                                   ?dateTimeStartValue core:dateTime ?dateTimeStart 
@@ -72,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <critical-data-required>
             FILTER ( bound(?org) )
             </critical-data-required>
-        } ORDER BY <collated>?subclass</collated> DESC(?dateTimeEnd) DESC(?dateTimeStart) ?orgName
+        } ORDER BY <collated>?subclass</collated> DESC(?dateTimeEnd) ?rank 
     </query-select>
        
     <query-construct>
@@ -107,6 +109,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             } UNION {
                ?subject ?property ?position .
                ?position ?positionProperty ?positionValue 
+            } UNION {
+               ?subject ?property ?position .
+               ?position core:rank ?rank 
             } UNION {
                ?subject ?property ?position .
                ?position core:positionInOrganization ?org . 

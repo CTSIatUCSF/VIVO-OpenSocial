@@ -82,10 +82,6 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
         return innerStmt.getSubjectURI();
     }
 
-    public boolean isSubjectOriented() {
-        return innerStmt.isSubjectOriented();
-    }
-
     public void setObject(Individual object) {
         innerStmt.setObject(object);
     }
@@ -104,10 +100,6 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
 
     public void setSubject(Individual subject) {
         innerStmt.setSubject(subject);
-    }
-
-    public void setSubjectOriented(boolean subjectOriented) {
-        innerStmt.setSubjectOriented(subjectOriented);
     }
 
     public void setSubjectURI(String subjectURI) {

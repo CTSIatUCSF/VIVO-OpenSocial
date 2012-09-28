@@ -29,7 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <#-- Template for browsing individuals in class groups for menupages -->
 
 <#import "lib-string.ftl" as str>
+<noscript>
+<p style="padding: 20px 20px 20px 20px;background-color:#f8ffb7">This browse page requires javascript, but your browser is set to disable javascript. Either enable javascript or use the <a href="http://localhost:8080/vivo/browse" title="index page">index page</a> to browse for information.</p>
+</noscript>
 
+<section id="noJavascriptContainer" class="hidden">
 <section id="browse-by" role="region">
     <nav role="navigation">
         <ul id="browse-classes">
@@ -60,7 +64,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     
     <section id="individuals-in-class" role="region">
         <ul role="list">
+
             <#-- Will be populated dynamically via AJAX request -->
         </ul>
     </section>
 </section>
+</section>
+<script type="text/javascript">
+    $('section#noJavascriptContainer').removeClass('hidden');
+</script>

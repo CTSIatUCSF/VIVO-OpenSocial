@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             
             <@widget name="login" />
             
-            <@allClassGroups vClassGroups />
+            <@allClassGroups vClassGroups! />
         
         <#include "footer.ftl">
     </body>

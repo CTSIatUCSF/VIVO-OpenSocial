@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
-<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<% request.setAttribute("requestedActions", SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
 <script type="text/javascript">
@@ -55,7 +55,11 @@ function init(){
     <td>
      <form name="sdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="sdbModels"/>
+<% if ("SDB models".equals(request.getAttribute("infoLine"))) { %>
         <input type="submit" name="submit" value="SDB Models"/>
+<% } else { %>
+        <input type="submit" name="submit" value="Main Store Models"/>
+<% } %>
     </form>
     </td>
     <td>

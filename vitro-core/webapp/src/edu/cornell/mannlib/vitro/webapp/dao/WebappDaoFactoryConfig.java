@@ -28,30 +28,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class WebappDaoFactoryConfig {
 	
-	private String[] preferredLanguages;
+	private List<String> preferredLanguages;
 	private String defaultNamespace;
 	private Set<String> nonUserNamespaces;
 	
 	public WebappDaoFactoryConfig() {
-        preferredLanguages = new String[3];
-        preferredLanguages[0] = "en-US";
-        preferredLanguages[1] = "en";
-        preferredLanguages[2] = "EN";
+	    preferredLanguages = Arrays.asList("en-US", "en", "EN");
 		defaultNamespace = "http://vitro.mannlib.cornell.edu/ns/default#";
 		nonUserNamespaces = new HashSet<String>();
 		nonUserNamespaces.add(VitroVocabulary.vitroURI);
 	}
 	
-	public String[] getPreferredLanguages() {
+	public List<String> getPreferredLanguages() {
 		return this.preferredLanguages;
 	}
 	
-	public void setPreferredLanguages(String[] pl) {
+	public void setPreferredLanguages(List<String> pl) {
 		this.preferredLanguages = pl;
 	}
 	

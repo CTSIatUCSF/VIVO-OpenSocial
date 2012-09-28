@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     	<#assign property = editConfiguration.objectPropertyStatementDisplayPropertyModel />
     </#if>
 <#else>
-	<#assign statement = editConfiguration.dataStatementDisplay />
+	<#assign statement = editConfiguration.dataLiteralValuesAsString />   
 </#if>
 
 <#assign deletionTemplateName = editConfiguration.deleteTemplate/>
@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <#include deletionTemplateName />
             </#if>
         <#else>
-            ${statement}
+            ${statement}  
         </#if>
     </p>
     

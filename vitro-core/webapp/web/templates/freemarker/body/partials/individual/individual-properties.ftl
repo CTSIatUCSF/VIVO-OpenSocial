@@ -29,9 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <#-- Template for property listing on individual profile page -->
 
 <#import "lib-properties.ftl" as p>
-
+<#assign subjectUri = individual.controlPanelUrl()?split("=") >
 <#list propertyGroups.all as group>
     <#assign groupName = group.getName(nameForOtherGroup)>
+    <#assign verbose = (verbosePropertySwitch.currentValue)!false>
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
@@ -42,7 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         
         <#-- Display the group heading --> 
         <#if groupName?has_content>
-            <h2 id="${groupName}">${groupName?capitalize}</h2>
+    		<#--the function replaces spaces in the name with underscores, also called for the property group menu-->
+        	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
+            <h2 id="${groupNameHtmlId}">${groupName?capitalize}</h2>
         <#else>
             <h2 id="properties">Properties</h2>
         </#if>
@@ -51,9 +54,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <#list group.properties as property>
             <article class="property" role="article">
                 <#-- Property display name -->
-                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /></h3>               
+                <#if property.localName == "authorInAuthorship" && editable  >
+                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                        <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="manage publications" <#if verbose>style="padding-top:10px"</#if> >
+                            manage publications
+                        </a>
+                    </h3>
+                <#elseif property.localName == "hasResearcherRole" && editable  >
+                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbose>style="padding-top:10px"</#if> >
+                        manage grants & projects
+                    </a>
+                </h3>
+                <#elseif property.localName == "organizationForPosition" && editable  >
+                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="manage people" <#if verbose>style="padding-top:10px"</#if> >
+                        manage affiliated people
+                    </a>
+                </h3>
+                <#else>
+                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
+                </#if>
                 <#-- List the statements for each property -->
-                <ul class="property-list" role="list">
+                <ul class="property-list" role="list" id="${property.localName}List">
                     <#-- data property -->
                     <#if property.type == "data">
                         <@p.dataPropertyList property editable />

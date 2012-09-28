@@ -63,6 +63,21 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 public class BasicAuthenticator extends Authenticator {
 	private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
+	// ----------------------------------------------------------------------
+	// The factory
+	// ----------------------------------------------------------------------
+
+	public static class Factory implements AuthenticatorFactory {
+		@Override
+		public Authenticator getInstance(HttpServletRequest req) {
+			return new BasicAuthenticator(req);
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// The authenticator
+	// ----------------------------------------------------------------------
+
 	private final HttpServletRequest request;
 
 	public BasicAuthenticator(HttpServletRequest request) {
@@ -85,6 +100,13 @@ public class BasicAuthenticator extends Authenticator {
 			return null;
 		}
 		return userAccountsDao.getUserAccountByExternalAuthId(externalAuthId);
+	}
+
+	@Override
+	public boolean isUserPermittedToLogin(UserAccount userAccount) {
+		// All users are permitted to login. If the user doesn't have an account
+		// yet (userAccount is null), an account should be created for them.
+		return true;
 	}
 
 	@Override
@@ -146,7 +168,10 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public void recordLoginAgainstUserAccount(UserAccount userAccount,
-			AuthenticationSource authSource) {
+			AuthenticationSource authSource) throws LoginNotPermitted {
+		if (!isUserPermittedToLogin(userAccount)) {
+			throw new LoginNotPermitted();
+		}
 		if (userAccount == null) {
 			log.error("Trying to record the login of a null user. ");
 			return;
@@ -160,10 +185,11 @@ public class BasicAuthenticator extends Authenticator {
 		setSessionTimeoutLimit(userAccount, session);
 		recordInUserSessionMap(userAccount.getUri(), session);
 		notifyOtherUsers(userAccount.getUri(), session);
-		
+
 		if (IsRootUser.isRootUser(RequestIdentifiers
 				.getIdBundleForRequest(request))) {
-			IndexBuilder.checkIndexOnRootLogin(request);		}
+			IndexBuilder.checkIndexOnRootLogin(request);
+		}
 	}
 
 	/**
@@ -310,6 +336,11 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		return wadf;
+	}
+
+	@Override
+	public String toString() {
+		return "BasicAuthenticator[" + request + "]";
 	}
 
 }

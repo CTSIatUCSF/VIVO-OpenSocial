@@ -41,12 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </#macro>
 
 <#-- After selecting an individual via autocomplete, display highlighted and with verify link -->
-<#macro acSelection urlsBase inputName inputId inputValue labelValue="">
-<div class="acSelection">
+<#macro acSelection urlsBase inputName inputId acGroupName inputValue labelValue="">
+<div class="acSelection" acGroupName="${acGroupName}">
     <p class="inline">
         <label>${labelValue}</label>
         <span class="acSelectionInfo"></span>
-        <a href="${urlsBase}/individual?uri=" class="verifyMatch" title="verify match">(Verify this match)</a>
+        <a href="${urlsBase}/individual?uri=" class="verifyMatch" title="verify match">(Verify this match</a> or 
+        <a href="#" class="changeSelection" id="changeSelection">change selection)</a>
         </p>
         <input class="acUriReceiver" type="hidden" id="${inputId}" name="${inputName}" value="${inputValue}" />
         <!-- Field value populated by JavaScript -->

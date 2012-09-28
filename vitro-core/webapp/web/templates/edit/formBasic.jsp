@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <form id="editForm" name="editForm" action="${action}" method="post" onsubmit="${onSubmit}">
     <input type="hidden" name="_epoKey" value="${epoKey}" />
 
-<table cellpadding="4" cellspacing="2">
+<table cellpadding="4" cellspacing="2"  style="background-color:#fff">
 	<tr><th colspan="${colspan}">
 	<div>
 		<h2>${title}</h2>

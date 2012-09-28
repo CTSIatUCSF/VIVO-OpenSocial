@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <#--Retrieve variables needed-->
 <#assign url = lvf.getFormFieldValue(editSubmission, editConfiguration, "url")/>
+<#assign urlTypeValue = lvf.getFormFieldValue(editSubmission, editConfiguration, "urlType")/>
 <#assign anchor = lvf.getFormFieldValue(editSubmission, editConfiguration, "anchor") />
 <#assign newRank = lvf.getFormFieldValue(editSubmission, editConfiguration, "newRank") />
 
@@ -72,8 +73,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </section>
 </#if>    
     
-<form class="customForm" action ="${submitUrl}" class="customForm">
+<form class="customForm" action ="${submitUrl}">
 
+    <label for="urlType">URL Type${requiredHint}</label>
+    <#assign urlTypeOpts = editConfiguration.pageData.urlType />
+    <select name="urlType" style="margin-top:-2px" >
+        <option value="" <#if editMode == "add">selected</#if>>Select one</option>                
+        <#list urlTypeOpts?keys as key>             
+            <option value="${key}"  <#if urlTypeValue == key>selected</#if> >
+                <#if urlTypeOpts[key] == "F1000 Link">
+                    Faculty of 1000 Link
+                <#else>
+                    Standard Web Link
+                </#if>
+            </option>         
+        </#list>
+    </select>
     <label for="url">URL ${requiredHint}</label>
     <input  size="70"  type="text" id="url" name="url" value="${url}" role="input" />
    
@@ -91,7 +106,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </p>    
 </form>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/userMenu/userMenuUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}

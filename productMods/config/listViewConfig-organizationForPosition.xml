@@ -40,7 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         ?position
                         ?positionTitle 
                         ?person ?personName 
-                        ?dateTimeStart ?dateTimeEnd WHERE {
+                        ?dateTimeStart ?dateTimeEnd 
+                        ?hideThis
+        WHERE {
             ?subject ?property ?position  
             OPTIONAL { ?position core:positionForPerson ?person .
                        ?person rdfs:label ?personName   
@@ -51,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             }   
             </collated>
             OPTIONAL { ?position rdfs:label ?positionTitle }
+            OPTIONAL { ?position core:hideFromDisplay ?hideThis }
             OPTIONAL { ?position core:dateTimeInterval ?dateTimeInterval 
                        OPTIONAL { ?dateTimeInterval core:start ?dateTimeStartValue .                     
                                   ?dateTimeStartValue core:dateTime ?dateTimeStart 
@@ -59,7 +62,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                   ?dateTimeEndValue core:dateTime ?dateTimeEnd  
                        }
             # Get current positions only: end date is either null or not in the past
-            } FILTER ( !bound(?dateTimeEnd) ||                        
+            } 
+        #      NOT EXISTS { ?position core:hideFromDisplay ?hideThis }
+              FILTER ( !bound(?dateTimeEnd) ||                        
                        afn:substring(str(?dateTimeEnd), 0, 4) &gt;= afn:substring(str(afn:now()), 0, 4) )
               <critical-data-required>
               FILTER ( bound(?person) )

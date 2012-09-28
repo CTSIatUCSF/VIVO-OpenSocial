@@ -28,9 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.lang.String;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
@@ -53,12 +57,22 @@ public class PublicationHasAuthorValidator implements N3ValidatorVTwo {
         Map<String,String> errors = new HashMap<String,String>();   
         
         List<String> personUri = urisFromForm.get("personUri");
+        List<String> orgUri = urisFromForm.get("orgUri");
+        List<Literal> orgNameList = literalsFromForm.get("orgName");
+        
         if (allListElementsEmpty(personUri)) {
             personUri = null;
         }
-        // If there's a personUri, then we're done. The firstName and lastName fields are
+        if (allListElementsEmpty(orgUri)) {
+            orgUri = null;
+        }
+        Literal orgName = null;
+        if(orgNameList != null && orgNameList.size() > 0) {
+	        orgName = orgNameList.get(0);
+        }
+        // If there's a personUri, orgUri or orgName, then we're done. The firstName and lastName fields are
         // disabled and so don't get submitted.
-        if (personUri != null) {
+        if (personUri != null || orgUri != null || orgName != null ) {
             return null;
         }
         

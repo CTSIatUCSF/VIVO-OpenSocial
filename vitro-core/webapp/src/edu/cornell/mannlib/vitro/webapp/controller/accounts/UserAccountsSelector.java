@@ -137,8 +137,8 @@ public class UserAccountsSelector {
 				.replace("%offset%", offset());
 		log.debug("main query: " + qString);
 
-		List<UserAccount> accounts = new SparqlQueryRunner<List<UserAccount>>(
-				model, new MainQueryParser()).executeQuery(qString);
+		List<UserAccount> accounts = new SparqlQueryRunner(model)
+				.executeSelect(new MainQueryParser(), qString);
 		log.debug("query returns: " + accounts);
 		return accounts;
 	}
@@ -152,8 +152,8 @@ public class UserAccountsSelector {
 				.replace("%filterClauses%", filterClauses());
 		log.debug("count query: " + qString);
 
-		int count = new SparqlQueryRunner<Integer>(model,
-				new CountQueryParser()).executeQuery(qString);
+		int count = new SparqlQueryRunner(model).executeSelect(
+				new CountQueryParser(), qString);
 		log.debug("result count: " + count);
 		return count;
 	}
@@ -165,8 +165,8 @@ public class UserAccountsSelector {
 					PREFIX_LINES).replace("%uri%", uri);
 			log.debug("permissions query: " + qString);
 
-			Set<String> permissions = new SparqlQueryRunner<Set<String>>(model,
-					new PermissionsQueryParser()).executeQuery(qString);
+			Set<String> permissions = new SparqlQueryRunner(model)
+					.executeSelect(new PermissionsQueryParser(), qString);
 			log.debug("permissions for '" + uri + "': " + permissions);
 			account.setPermissionSetUris(permissions);
 		}

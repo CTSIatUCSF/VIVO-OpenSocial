@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </p>
         
         <p>
-            We have created your new VIVO account associated with ${userAccount.emailAddress}.
+            We have created your new account on ${siteName}, associated with ${userAccount.emailAddress}.
         </p>
         
         <p>
@@ -77,8 +77,8 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Congratulations!
 
-We have created your new VIVO account associated with 
-${userAccount.emailAddress}.
+We have created your new account on ${siteName},
+associated with ${userAccount.emailAddress}.
 
 If you did not request this new account you can safely ignore this email. 
 This request will expire if not acted upon for 30 days.
