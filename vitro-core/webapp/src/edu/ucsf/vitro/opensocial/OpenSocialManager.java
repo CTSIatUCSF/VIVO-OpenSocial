@@ -295,7 +295,7 @@ public class OpenSocialManager {
 		String[] tokenService = configuration.getProperty(
 				"OpenSocial.tokenService").split(":");
 		String request = "c=default" + (viewer != null ? "&v=" + URLEncoder.encode(viewer, "UTF-8") : "") + 
-				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + gadget + "\r\n";
+				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + URLEncoder.encode(gadget, "UTF-8") + "\r\n";
 
 		// Create a socket connection with the specified server and port.
 		Socket s = new Socket(tokenService[0],
